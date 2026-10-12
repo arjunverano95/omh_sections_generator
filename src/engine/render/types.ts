@@ -40,20 +40,27 @@ export const CONTAINER_TAGS = [
   'ol',
   'li',
   'figure',
+  'figcaption',
+  'blockquote',
 ] as const
 export type ContainerTag = (typeof CONTAINER_TAGS)[number]
 
 export const LIST_COLLECTIONS = ['posts', 'pages', 'categories'] as const
 export type ListCollection = (typeof LIST_COLLECTIONS)[number]
 
-/** A reference into the scope chain: `['meta', 'image']` for `meta.image`. */
-export type Ref = { path: string[] }
+/**
+ * A reference into the scope chain: `['meta', 'image']` for `meta.image`. `depth` is the
+ * index into the scope chain (0 = innermost) that declares `path[0]`; the compiler always
+ * emits it, so the renderer never guesses when a row omits an unset field. Without `depth`
+ * (hand-written plans) the renderer searches outward for the first scope holding the key.
+ */
+export type Ref = { path: string[]; depth?: number }
 /** Fixed text that is not editable. */
 export type Literal = { value: string }
 export type Source = Ref | Literal
 
 /** `if:` — a bare reference tests truthiness; exactly one of `equals` / `not` otherwise. */
-export type Condition = { path: string[]; equals?: unknown; not?: unknown }
+export type Condition = { path: string[]; depth?: number; equals?: unknown; not?: unknown }
 
 /**
  * The literal-button form: destination from the data or a fixed URL. `label` is the anchor
@@ -76,7 +83,11 @@ export type ListQuery = {
 
 type Common = { className?: string; if?: Condition }
 
-export type TextNode = Common & { type: 'text'; source: Source; as: TextTag }
+/**
+ * `labels` is present only when the source is a `select` whose options carry labels that
+ * differ from their values; the renderer prints the label for the stored value.
+ */
+export type TextNode = Common & { type: 'text'; source: Source; as: TextTag; labels?: Record<string, string> }
 export type RichTextNode = Common & { type: 'richText'; source: Ref }
 export type ImageNode = Common & { type: 'image'; source: Ref; priority?: boolean; sizes?: string }
 export type IconNode = Common & { type: 'icon'; source: Ref; size?: number }

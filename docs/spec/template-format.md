@@ -14,6 +14,7 @@ templates/<name>/
   seed/pages.yaml        demo content, read by the seeder (optional)
   seed/globals.yaml
   seed/forms.yaml
+  seed/media.yaml        optional: file name to alt text for the uploads
   seed/media/*           files the seeds reference
   assets/*.png           block preview images shown in the admin (optional)
 ```
@@ -98,7 +99,7 @@ variants:                           # named class presets
 ```yaml
 name: hero-split                 # kebab-case; unique within the template
 label: Split hero                # block name in the admin
-plural: Split heroes             # optional; default is label + "s"
+plural: Split heroes             # optional; default adds an "s" unless the label already ends in one
 description: Heading and copy on the left, image on the right.
 group: Heroes                    # optional; groups blocks in the add-block drawer
 preview: ../assets/hero-split.png   # optional
@@ -213,7 +214,7 @@ Rows may nest arrays one level deep. Deeper nesting is rejected; it makes the ad
 | `list` | a query (6.4) | `children` once per document | `as`, `class`, `variant`, `children` (required) |
 | `form` | reference to `form` | the form, submitting to the form-builder plugin | `class`, `if` |
 
-**`as`.** For `text`: `p`, `span`, `h1` to `h6`, `blockquote`, `small`, `strong`, `em`, `li`, `dt`, `dd`, `figcaption`. For `div`, `each` and `list`: `div`, `section`, `header`, `footer`, `nav`, `main`, `article`, `aside`, `ul`, `ol`, `li`, `figure`. `each` and `list` without `as` render their rows with no wrapper element.
+**`as`.** For `text`: `p`, `span`, `h1` to `h6`, `blockquote`, `small`, `strong`, `em`, `li`, `dt`, `dd`, `figcaption`. For `div`, `each` and `list`: `div`, `section`, `header`, `footer`, `nav`, `main`, `article`, `aside`, `ul`, `ol`, `li`, `figure`, `figcaption`, `blockquote`. `each` and `list` without `as` render their rows with no wrapper element.
 
 **`class`.** Tailwind classes, applied after the variant's classes. On `div` the primitive key's value *is* the class string, so `div` has no separate `class` option.
 
@@ -376,7 +377,7 @@ footer: { ... }
         form: "@form/contact"
 ```
 
-Reference tokens: `@media/<file>` uploads `seed/media/<file>` once and reuses it; `@page/<slug>` and `@form/<key>` resolve after those documents exist (pages are created in two passes so links between them resolve). `richText` values are written as Markdown strings and converted with the Lexical package's Markdown converter. Field values are validated against the section's fields before anything is written.
+Reference tokens: `@media/<file>` uploads `seed/media/<file>` once and reuses it; `@page/<slug>` and `@form/<key>` resolve after those documents exist (pages are created in two passes so links between them resolve); `@category/<slug>` resolves to a category the posts seed created, so a `relation` to categories can be seeded and a `list` filter exercised. `richText` values are written as Markdown strings and converted with the Lexical package's Markdown converter. Field values are validated against the section's fields before anything is written.
 
 ## 9. Validation rules
 

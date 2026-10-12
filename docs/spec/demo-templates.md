@@ -30,7 +30,7 @@ Everything under `templates/` for both faces is YAML and media. Zero `.ts` or `.
 
 | Section | Fields | Layout |
 | --- | --- | --- |
-| `hero-split` | `eyebrow` text · `heading` text required · `description` textarea · `primaryButton` link · `secondaryButton` link · `image` image required | two-column grid; copy and buttons left, image right |
+| `hero-split` | `eyebrow` text · `heading` text required · `description` textarea · `primaryButton` link · `secondaryButton` link · `image` image (optional, so the Contact page can show an empty optional rendering nothing) | two-column grid; copy and buttons left, image right under `if: image` |
 | `features` | `heading` text · `intro` textarea · `columns` select `2`/`3`/`4` · `items` array (`icon`, `title`, `text` textarea) | heading, intro, then one grid per `columns` value chosen with `if: { field: columns, equals: n }` |
 | `latest-posts` | `heading` text · `category` relation to `categories` · `allPostsLink` link | `list` over posts, limit 3, `-publishedAt`, `where: { categories: { in: { field: category } } }`; each card: `meta.image`, `title`, `publishedAt`, `button: { label: Read, href: url }` |
 | `testimonial` | `quote` richText required · `name` text · `role` text · `avatar` image | centred quote with an avatar row |
