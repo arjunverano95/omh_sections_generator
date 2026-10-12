@@ -130,6 +130,7 @@ describe('templates/', () => {
       .sort()
     expect(result.site!.manifest.blocks).toEqual(names)
     expect(result.site!.manifest.siteName).toBe('Studio')
+    expect(result.site!.manifest.colorMode).toBe('light')
   })
 
   for (const file of GENERATED_FILE_NAMES) {

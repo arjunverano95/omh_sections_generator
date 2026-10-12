@@ -59,9 +59,15 @@ export type GlobalMeta = {
   fields: FieldMeta[]
 }
 
+/** `colorMode` from theme.yaml: the palette every visitor gets, or `system` for the device setting. */
+export const COLOR_MODES = ['light', 'dark', 'system'] as const
+export type ColorMode = (typeof COLOR_MODES)[number]
+
 export type Manifest = {
   /** `siteName` from theme.yaml: the title suffix in page metadata and the seed button's label. */
   siteName: string
+  /** `colorMode` from theme.yaml, `system` when the file leaves it out. */
+  colorMode: ColorMode
   /** Block slugs in the order the admin lists them. */
   blocks: string[]
   globals: GlobalName[]

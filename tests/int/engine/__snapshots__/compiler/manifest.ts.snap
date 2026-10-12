@@ -5,6 +5,7 @@ import type { Manifest } from '@/engine/manifest'
 
 export const manifest: Manifest = {
   siteName: 'Studio',
+  colorMode: 'light',
   blocks: [
     'contact',
     'cta-band',

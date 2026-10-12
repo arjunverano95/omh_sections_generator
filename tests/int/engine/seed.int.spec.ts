@@ -61,6 +61,7 @@ const section = (name: string, fields: FieldMeta[]): SectionMeta => ({
 
 const manifest: Manifest = {
   siteName: 'Studio',
+  colorMode: 'light',
   blocks: [
     'contact',
     'cta-band',

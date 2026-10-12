@@ -2,6 +2,7 @@
 
 import React, { createContext, useCallback, use, useEffect, useState } from 'react'
 
+import type { ColorMode } from '@/engine/manifest'
 import type { Theme, ThemeContextType } from './types'
 
 import canUseDOM from '@/utilities/canUseDOM'
@@ -15,7 +16,8 @@ const initialContext: ThemeContextType = {
 
 const ThemeContext = createContext(initialContext)
 
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+/** `colorMode` comes from the theme: `light` or `dark` is fixed, `system` follows the visitor. */
+export const ThemeProvider = ({ children, colorMode }: { children: React.ReactNode; colorMode: ColorMode }) => {
   const [theme, setThemeState] = useState<Theme | undefined>(
     canUseDOM ? (document.documentElement.getAttribute('data-theme') as Theme) : undefined,
   )
@@ -35,21 +37,26 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     let themeToSet: Theme = defaultTheme
-    const preference = window.localStorage.getItem(themeLocalStorageKey)
 
-    if (themeIsValid(preference)) {
-      themeToSet = preference
+    if (themeIsValid(colorMode)) {
+      themeToSet = colorMode
     } else {
-      const implicitPreference = getImplicitPreference()
+      const preference = window.localStorage.getItem(themeLocalStorageKey)
 
-      if (implicitPreference) {
-        themeToSet = implicitPreference
+      if (themeIsValid(preference)) {
+        themeToSet = preference
+      } else {
+        const implicitPreference = getImplicitPreference()
+
+        if (implicitPreference) {
+          themeToSet = implicitPreference
+        }
       }
     }
 
     document.documentElement.setAttribute('data-theme', themeToSet)
     setThemeState(themeToSet)
-  }, [])
+  }, [colorMode])
 
   return <ThemeContext value={{ setTheme, theme }}>{children}</ThemeContext>
 }

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { COLOR_MODES } from '../manifest'
 import { COLOR_SLOTS, CSS_LENGTH_RE, REQUIRED_LIGHT_SLOTS } from './common'
 
 /** A Google Fonts family name, or the long form with weights and subsets. */
@@ -34,6 +35,7 @@ export const VariantsSchema = z.record(
 export const ThemeSchema = z.strictObject({
   kind: z.literal('theme').optional(),
   siteName: z.string().min(1, { error: 'siteName is the name of the site, shown in page titles' }),
+  colorMode: z.enum(COLOR_MODES, { error: 'colorMode is light, dark or system' }).optional(),
   fonts: z.strictObject({
     sans: FontSpecSchema,
     heading: FontSpecSchema.optional(),

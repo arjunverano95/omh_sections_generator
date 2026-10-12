@@ -34,6 +34,7 @@ function fieldMeta(field: NField): FieldMeta {
 export function buildManifest(t: Omit<NormalisedSite, 'manifest'>): Manifest {
   const manifest: Manifest = {
     siteName: t.theme.siteName,
+    colorMode: t.theme.colorMode,
     blocks: t.sections.map((s) => s.slug),
     globals: ['header', 'footer'],
     sections: {},

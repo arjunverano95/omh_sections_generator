@@ -1,13 +1,16 @@
 import React from 'react'
 
+import type { ColorMode } from '@/engine/manifest'
+
 import { HeaderThemeProvider } from './HeaderTheme'
 import { ThemeProvider } from './Theme'
 
 export const Providers: React.FC<{
   children: React.ReactNode
-}> = ({ children }) => {
+  colorMode: ColorMode
+}> = ({ children, colorMode }) => {
   return (
-    <ThemeProvider>
+    <ThemeProvider colorMode={colorMode}>
       <HeaderThemeProvider>{children}</HeaderThemeProvider>
     </ThemeProvider>
   )

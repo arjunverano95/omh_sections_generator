@@ -7,6 +7,7 @@ import React from 'react'
 import { AdminBar } from '@/components/AdminBar'
 import { RenderGlobal } from '@/engine/render/RenderGlobal'
 import { fontVariables } from '@/generated/sections/fonts'
+import { manifest } from '@/generated/sections/manifest'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
@@ -23,12 +24,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html className={cn(fontVariables, GeistMono.variable)} lang="en" suppressHydrationWarning>
       <head>
-        <InitTheme />
+        <InitTheme colorMode={manifest.colorMode} />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
       </head>
       <body>
-        <Providers>
+        <Providers colorMode={manifest.colorMode}>
           <AdminBar
             adminBarProps={{
               preview: isEnabled,

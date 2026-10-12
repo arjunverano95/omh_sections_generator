@@ -14,6 +14,14 @@
           "type": "string",
           "minLength": 1
         },
+        "colorMode": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark",
+            "system"
+          ]
+        },
         "fonts": {
           "type": "object",
           "properties": {

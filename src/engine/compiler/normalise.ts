@@ -4,7 +4,7 @@
 
 import path from 'node:path'
 
-import type { FieldType, Manifest } from '../manifest'
+import type { ColorMode, FieldType, Manifest } from '../manifest'
 import type { Plan } from '../render/types'
 import type {
   FieldDef,
@@ -83,6 +83,7 @@ export type NFont = {
 
 export type NTheme = {
   siteName: string
+  colorMode: ColorMode
   fonts: { sans: NFont; heading: NFont }
   colors: { light: Partial<Record<ColorSlot, string>>; dark: Partial<Record<ColorSlot, string>> }
   radius?: string
@@ -127,6 +128,7 @@ export function normaliseTheme(theme: ThemeFile, file: LoadedFile): NTheme {
   }
   return {
     siteName: theme.siteName.trim(),
+    colorMode: theme.colorMode ?? 'system',
     fonts: { sans, heading },
     colors: { light: pick(theme.colors.light), dark: pick(theme.colors.dark) },
     radius: theme.radius,

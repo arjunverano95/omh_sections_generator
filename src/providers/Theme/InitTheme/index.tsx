@@ -1,9 +1,15 @@
 import Script from 'next/script'
 import React from 'react'
 
+import type { ColorMode } from '@/engine/manifest'
+
 import { defaultTheme, themeLocalStorageKey } from '../ThemeSelector/types'
 
-export const InitTheme: React.FC = () => {
+/**
+ * Sets `data-theme` before the first paint. A theme with `colorMode: light` or `dark` gets
+ * that palette for every visitor; `system` follows a stored choice, then the device setting.
+ */
+export const InitTheme: React.FC<{ colorMode: ColorMode }> = ({ colorMode }) => {
   return (
     // eslint-disable-next-line @next/next/no-before-interactive-script-outside-document
     <Script
@@ -27,15 +33,21 @@ export const InitTheme: React.FC = () => {
     }
 
     var themeToSet = '${defaultTheme}'
-    var preference = window.localStorage.getItem('${themeLocalStorageKey}')
+    var colorMode = '${colorMode}'
 
-    if (themeIsValid(preference)) {
-      themeToSet = preference
+    if (themeIsValid(colorMode)) {
+      themeToSet = colorMode
     } else {
-      var implicitPreference = getImplicitPreference()
+      var preference = window.localStorage.getItem('${themeLocalStorageKey}')
 
-      if (implicitPreference) {
-        themeToSet = implicitPreference
+      if (themeIsValid(preference)) {
+        themeToSet = preference
+      } else {
+        var implicitPreference = getImplicitPreference()
+
+        if (implicitPreference) {
+          themeToSet = implicitPreference
+        }
       }
     }
 
