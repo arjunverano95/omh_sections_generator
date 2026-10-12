@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../schema.json
+name: template-1
+label: Studio
+description: Light and editorial, with serif headings and a soft radius.
+theme: ./theme.yaml
+globals:
+  header: ./globals/header.yaml
+  footer: ./globals/footer.yaml
+sections: ./sections

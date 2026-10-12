@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=../../schema.json
+name: testimonial
+label: Testimonial
+description: A centred quote with the speaker's avatar, name and role.
+group: Content
+
+fields:
+  quote:
+    type: richText
+    required: true
+  name: text
+  role: text
+  avatar: image
+
+layout:
+  - div: bg-muted/50
+    as: section
+    children:
+      - div: container flex max-w-3xl flex-col items-center gap-8 py-20 text-center
+        as: figure
+        children:
+          - richText: quote
+            class: font-heading text-2xl leading-snug md:text-3xl
+          - div: flex items-center gap-4
+            as: figcaption
+            children:
+              - image: avatar
+                class: size-12 rounded-full object-cover
+                sizes: 48px
+                if: avatar
+              - div: flex flex-col items-start
+                children:
+                  - text: name
+                    as: strong
+                    class: font-medium
+                  - text: role
+                    as: span
+                    class: text-sm text-muted-foreground
+                    if: role

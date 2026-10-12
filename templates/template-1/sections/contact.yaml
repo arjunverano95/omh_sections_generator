@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=../../schema.json
+name: contact
+label: Contact
+description: Heading and copy on the left, a form on the right.
+group: Forms
+
+fields:
+  heading: text
+  text: textarea
+  form:
+    type: form
+    required: true
+
+layout:
+  - div: container grid gap-12 py-20 md:grid-cols-2
+    as: section
+    children:
+      - div: flex flex-col gap-4
+        children:
+          - text: heading
+            as: h2
+            variant: heading.section
+          - text: text
+            variant: text.lead
+            if: text
+      - form: form
+        class: rounded-lg border border-border bg-card p-6 md:p-8

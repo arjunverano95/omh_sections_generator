@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=../../schema.json
+name: hero-split
+label: Split hero
+plural: Split heroes
+description: Heading and copy on the left, image on the right.
+group: Heroes
+
+fields:
+  eyebrow: text
+  heading:
+    type: text
+    required: true
+  description: textarea
+  primaryButton: link
+  secondaryButton: link
+  image:
+    type: image
+    help: Optional. Without an image the copy spans the full width.
+
+layout:
+  - div: container grid gap-10 py-20 md:grid-cols-2 md:items-center md:py-28
+    as: section
+    children:
+      - div: flex flex-col gap-5
+        children:
+          - text: eyebrow
+            as: span
+            variant: text.eyebrow
+            if: eyebrow
+          - text: heading
+            as: h1
+            variant: heading.display
+          - text: description
+            variant: text.lead
+            if: description
+          - div: flex flex-wrap gap-3 pt-2
+            children:
+              - button: primaryButton
+                variant: button.primary
+                if: primaryButton
+              - button: secondaryButton
+                variant: button.ghost
+                if: secondaryButton
+      - image: image
+        class: aspect-[4/3] w-full rounded-lg object-cover
+        priority: true
+        sizes: "(min-width: 768px) 50vw, 100vw"
+        if: image

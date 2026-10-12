@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=../../../../../templates/schema.json
+name: 11-theme-missing-token
+label: Minimal
+theme: ./theme.yaml
+globals:
+  header: ./globals/header.yaml
+  footer: ./globals/footer.yaml
+sections: ./sections

@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../../../../templates/schema.json
+kind: global
+name: header
+fields:
+  siteName:
+    type: text
+    required: true
+layout:
+  - div: container py-4
+    as: header
+    children:
+      - text: siteName
+        as: span

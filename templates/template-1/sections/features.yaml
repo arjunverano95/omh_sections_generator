@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=../../schema.json
+name: features
+label: Features
+description: A heading, an intro and a grid of icon cards in two, three or four columns.
+group: Content
+
+fields:
+  heading: text
+  intro: textarea
+  columns:
+    type: select
+    default: "3"
+    options:
+      - { value: "2", label: Two columns }
+      - { value: "3", label: Three columns }
+      - { value: "4", label: Four columns }
+  items:
+    type: array
+    min: 1
+    max: 8
+    rowLabel: title
+    fields:
+      icon: icon
+      title:
+        type: text
+        required: true
+      text: textarea
+
+layout:
+  - div: container flex flex-col gap-12 py-20
+    as: section
+    children:
+      - div: flex max-w-2xl flex-col gap-4
+        children:
+          - text: heading
+            as: h2
+            variant: heading.section
+          - text: intro
+            variant: text.lead
+            if: intro
+      - each: items
+        as: ul
+        class: grid gap-8 md:grid-cols-2
+        if: { field: columns, equals: "2" }
+        children:
+          - div: flex flex-col gap-3 rounded-lg border border-border bg-card p-6
+            as: li
+            children:
+              - icon: icon
+                class: text-primary
+                size: 24
+              - text: title
+                as: h3
+                class: font-heading text-xl
+              - text: text
+                class: text-muted-foreground
+      - each: items
+        as: ul
+        class: grid gap-8 md:grid-cols-3
+        if: { field: columns, equals: "3" }
+        children:
+          - div: flex flex-col gap-3 rounded-lg border border-border bg-card p-6
+            as: li
+            children:
+              - icon: icon
+                class: text-primary
+                size: 24
+              - text: title
+                as: h3
+                class: font-heading text-xl
+              - text: text
+                class: text-muted-foreground
+      - each: items
+        as: ul
+        class: grid gap-8 sm:grid-cols-2 lg:grid-cols-4
+        if: { field: columns, equals: "4" }
+        children:
+          - div: flex flex-col gap-3 rounded-lg border border-border bg-card p-6
+            as: li
+            children:
+              - icon: icon
+                class: text-primary
+                size: 24
+              - text: title
+                as: h3
+                class: font-heading text-xl
+              - text: text
+                class: text-muted-foreground

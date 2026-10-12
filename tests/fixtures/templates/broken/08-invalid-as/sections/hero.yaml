@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../../../../templates/schema.json
+name: hero
+label: Hero
+fields:
+  heading:
+    type: text
+    required: true
+layout:
+  - div: container py-16
+    as: section
+    children:
+      - text: heading
+        as: h7
+        variant: heading.title

@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=../../schema.json
+- slug: home
+  title: Home
+  meta:
+    title: Studio
+    description: An editorial studio for brands that want to be read, not skimmed.
+    image: "@media/hero.jpg"
+  sections:
+    - hero-split:
+        eyebrow: Editorial design studio
+        heading: Work that reads well.
+        description: We design websites, publications and identities for brands that would rather be read than skimmed.
+        primaryButton: { type: reference, reference: "@page/contact", label: Start a project }
+        secondaryButton: { type: custom, url: /posts, label: Read the journal }
+        image: "@media/hero.jpg"
+    - features:
+        heading: What we do
+        intro: Three disciplines, one team, and a habit of writing everything down.
+        columns: "3"
+        items:
+          - icon: pen-tool
+            title: Editorial design
+            text: Layouts and type systems that make long reading feel short.
+          - icon: layout-grid
+            title: Websites
+            text: Fast, accessible sites on a CMS your editors will actually enjoy.
+          - icon: palette
+            title: Identity
+            text: Marks, palettes and voice that hold together across every surface.
+    - latest-posts:
+        heading: From the journal
+        category: "@category/technology"
+        allPostsLink: { type: custom, url: /posts, label: All posts }
+    - testimonial:
+        quote: |
+          Studio gave us a site our editors **love** to publish on. Six months in, nobody has asked for a developer.
+        name: Mara Lindqvist
+        role: Editor in chief, Northlight
+        avatar: "@media/avatar.jpg"
+    - contact:
+        heading: Say hello
+        text: Tell us about the project, the timeline and who you are writing for.
+        form: "@form/contact"
+
+- slug: contact
+  title: Contact
+  meta:
+    title: Contact
+    description: Start a project with Studio.
+  sections:
+    - hero-split:
+        eyebrow: Contact
+        heading: Let's make something people read.
+        description: Most projects start with a short call. Write to us below and we will set one up.
+    - contact:
+        heading: Project enquiry
+        text: We reply to every message within two working days.
+        form: "@form/contact"
