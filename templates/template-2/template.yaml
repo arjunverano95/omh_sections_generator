@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../schema.json
+name: template-2
+label: Launch
+description: Dark, product-launch face with grotesk type and sharp corners.
+theme: ./theme.yaml
+globals:
+  header: ./globals/header.yaml
+  footer: ./globals/footer.yaml
+sections: ./sections

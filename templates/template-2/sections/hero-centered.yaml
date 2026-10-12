@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=../../schema.json
+name: hero-centered
+label: Centered hero
+plural: Centered heroes
+description: Badge, headline, copy, icon bullets and two buttons over an optional background image.
+group: Heroes
+fields:
+  badge: text
+  heading:
+    type: text
+    required: true
+  description: textarea
+  primaryButton: link
+  secondaryButton: link
+  backgroundImage: image
+  bullets:
+    type: array
+    max: 4
+    rowLabel: text
+    fields:
+      icon: icon
+      text: text
+
+layout:
+  - div: relative flex min-h-[80vh] items-center overflow-hidden
+    as: section
+    children:
+      - image: backgroundImage
+        class: absolute inset-0 h-full w-full object-cover opacity-30
+        if: backgroundImage
+      - div: container relative flex flex-col items-center gap-6 text-center
+        children:
+          - text: badge
+            as: span
+            variant: text.badge
+            if: badge
+          - text: heading
+            as: h1
+            variant: heading.hero
+          - text: description
+            variant: text.lead
+          - each: bullets
+            as: ul
+            class: flex flex-wrap justify-center gap-x-8 gap-y-2
+            children:
+              - div: flex items-center gap-2
+                as: li
+                children:
+                  - icon: icon
+                    class: text-primary
+                  - text: text
+                    as: span
+          - div: flex flex-row gap-4
+            children:
+              - button: primaryButton
+                variant: button.primary
+              - button: secondaryButton
+                variant: button.secondary

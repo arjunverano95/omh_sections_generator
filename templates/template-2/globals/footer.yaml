@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=../../schema.json
+kind: global
+name: footer
+fields:
+  copyright: text
+  links:
+    type: array
+    max: 6
+    rowLabel: link
+    fields:
+      link: link
+  social:
+    type: array
+    max: 6
+    rowLabel: icon
+    fields:
+      icon:
+        type: icon
+        required: true
+      link:
+        type: link
+        required: true
+
+layout:
+  - div: border-t border-border
+    as: footer
+    children:
+      - div: container flex flex-col items-center gap-6 py-8 text-sm text-muted-foreground md:flex-row md:justify-between
+        children:
+          - text: copyright
+            as: small
+          - each: links
+            as: nav
+            class: flex flex-wrap items-center justify-center gap-6
+            children:
+              - button: link
+                variant: button.link
+          - each: social
+            as: ul
+            class: flex items-center gap-4
+            children:
+              - div: flex
+                as: li
+                children:
+                  - button: link
+                    variant: button.link
+                    children:
+                      - icon: icon
+                        size: 18

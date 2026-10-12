@@ -1,0 +1,111 @@
+# yaml-language-server: $schema=../../schema.json
+name: pricing
+label: Pricing
+plural: Pricing tables
+description: Up to three plan cards; tick "highlighted" to make one stand out.
+group: Conversion
+fields:
+  heading: text
+  plans:
+    type: array
+    min: 1
+    max: 3
+    rowLabel: name
+    fields:
+      name:
+        type: text
+        required: true
+      price:
+        type: number
+        required: true
+        min: 0
+        help: Price in US dollars, without the currency sign.
+      period:
+        type: select
+        default: month
+        options:
+          - { value: month, label: per month }
+          - { value: year, label: per year }
+      features:
+        type: array
+        max: 8
+        rowLabel: text
+        fields:
+          text:
+            type: text
+            required: true
+      button: link
+      highlighted:
+        type: checkbox
+        default: false
+
+layout:
+  - div: container flex flex-col items-center gap-12 py-24
+    as: section
+    children:
+      - text: heading
+        as: h2
+        variant: heading.section
+        class: text-center
+      - each: plans
+        as: ul
+        class: grid w-full gap-6 md:grid-cols-3 md:items-start
+        children:
+          - div: h-full
+            as: li
+            variant: card.planHighlighted
+            if: { field: highlighted, equals: true }
+            children:
+              - text: name
+                as: h3
+                class: text-lg font-semibold text-primary
+              - div: flex items-baseline gap-2
+                children:
+                  - text: { value: $ }
+                    as: span
+                    class: text-2xl font-semibold
+                  - text: price
+                    as: span
+                    class: font-heading text-5xl font-bold tracking-tight
+                  - text: period
+                    as: span
+                    class: text-sm text-muted-foreground
+              - each: features
+                as: ul
+                class: flex flex-col gap-3 text-sm
+                children:
+                  - text: text
+                    as: li
+                    class: border-l-2 border-primary pl-3
+              - button: button
+                variant: button.primary
+                class: mt-auto w-full
+          - div: h-full
+            as: li
+            variant: card.plan
+            if: { field: highlighted, not: true }
+            children:
+              - text: name
+                as: h3
+                class: text-lg font-semibold
+              - div: flex items-baseline gap-2
+                children:
+                  - text: { value: $ }
+                    as: span
+                    class: text-2xl font-semibold
+                  - text: price
+                    as: span
+                    class: font-heading text-5xl font-bold tracking-tight
+                  - text: period
+                    as: span
+                    class: text-sm text-muted-foreground
+              - each: features
+                as: ul
+                class: flex flex-col gap-3 text-sm
+                children:
+                  - text: text
+                    as: li
+                    class: border-l-2 border-border pl-3
+              - button: button
+                variant: button.secondary
+                class: mt-auto w-full

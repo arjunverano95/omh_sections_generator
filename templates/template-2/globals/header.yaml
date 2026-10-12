@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=../../schema.json
+kind: global
+name: header
+fields:
+  wordmark:
+    type: text
+    required: true
+    help: The product name shown at the top left; it links to the home page.
+  navItems:
+    type: array
+    max: 5
+    rowLabel: link
+    fields:
+      link: link
+  primaryCta:
+    type: link
+    label: Primary call to action
+  secondaryCta:
+    type: link
+    label: Secondary call to action
+
+layout:
+  - div: border-b border-border bg-background/80 backdrop-blur
+    as: header
+    children:
+      - div: container flex items-center justify-between gap-6 py-4
+        children:
+          - button: { href: { value: / } }
+            class: flex items-center
+            children:
+              - text: wordmark
+                as: span
+                class: font-heading text-xl font-bold tracking-tight
+          - each: navItems
+            as: nav
+            class: hidden items-center gap-8 md:flex
+            children:
+              - button: link
+                variant: button.link
+          - div: flex items-center gap-3
+            children:
+              - button: secondaryCta
+                variant: button.link
+                class: hidden sm:inline-flex
+                if: secondaryCta
+              - button: primaryCta
+                variant: button.primary
+                class: px-4 py-2 text-sm
+                if: primaryCta
