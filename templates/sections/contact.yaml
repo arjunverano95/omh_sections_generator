@@ -2,7 +2,7 @@
 name: contact
 label: Contact
 description: Heading and copy on the left, a form on the right.
-group: Forms
+group: Conversion
 
 fields:
   heading: text

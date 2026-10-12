@@ -2,7 +2,7 @@
 name: latest-posts
 label: Latest posts
 description: The three most recent posts, optionally from one category.
-group: Content
+group: Blog
 
 fields:
   heading: text

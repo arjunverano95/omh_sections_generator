@@ -13,7 +13,7 @@ export const ContactBlock: Block = {
     plural: 'Contacts',
   },
   admin: {
-    group: 'Forms',
+    group: 'Conversion',
   },
   fields: [
     {
@@ -156,7 +156,7 @@ export const LatestPostsBlock: Block = {
     plural: 'Latest posts',
   },
   admin: {
-    group: 'Content',
+    group: 'Blog',
   },
   fields: [
     {
@@ -185,7 +185,7 @@ export const TestimonialBlock: Block = {
     plural: 'Testimonials',
   },
   admin: {
-    group: 'Content',
+    group: 'Social proof',
   },
   fields: [
     {

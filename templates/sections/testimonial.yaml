@@ -2,7 +2,7 @@
 name: testimonial
 label: Testimonial
 description: A centred quote with the speaker's avatar, name and role.
-group: Content
+group: Social proof
 
 fields:
   quote:
