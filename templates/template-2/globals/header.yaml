@@ -12,8 +12,12 @@ fields:
     rowLabel: link
     fields:
       link: link
-  primaryCta: link
-  secondaryCta: link
+  primaryCta:
+    type: link
+    label: Primary call to action
+  secondaryCta:
+    type: link
+    label: Secondary call to action
 
 layout:
   - div: border-b border-border bg-background/80 backdrop-blur

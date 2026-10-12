@@ -1,6 +1,7 @@
 # yaml-language-server: $schema=../../schema.json
 name: pricing
 label: Pricing
+plural: Pricing tables
 description: Up to three plan cards; tick "highlighted" to make one stand out.
 group: Conversion
 fields:

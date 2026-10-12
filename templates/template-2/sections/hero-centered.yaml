@@ -1,6 +1,7 @@
 # yaml-language-server: $schema=../../schema.json
 name: hero-centered
 label: Centered hero
+plural: Centered heroes
 description: Badge, headline, copy, icon bullets and two buttons over an optional background image.
 group: Heroes
 fields:
