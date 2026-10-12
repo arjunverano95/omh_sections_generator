@@ -91,8 +91,8 @@ After adding `RowLabel.tsx`, `pnpm generate:importmap` once; the path is fixed, 
 
 ### `src/endpoints/seed/`
 
-- `index.ts` keeps its clearing logic and calls `seedTemplate(payload, req, manifest.name)` from `src/engine/seed/`.
-- `src/engine/seed/` reads `templates/<t>/seed/*.yaml`, uploads `seed/media/*` with `payload.create({ collection: 'media', filePath })`, creates forms, creates pages in two passes (first without link references, then updates them), then sets the globals. Every section's data is validated against the section's fields before writing.
+- `index.ts` keeps its clearing logic (categories, media, pages, posts, forms, form submissions, search results and their versions) and calls `seedTemplate({ payload, req, config, templateDir, manifest })` from `src/engine/seed/`. `config` is the route handler's own awaited `@payload-config`, not `payload.config`: Next.js bundles `lexical` once per server layer and `getPayload` caches one instance for all of them, so the editors on the cached instance usually belong to the admin layer's copy and the route layer's headless editor rejects their node classes. The seeder writes everything with `disableRevalidate`; the endpoint then revalidates the `global_<slug>` tags, both sitemap tags and `revalidatePath('/', 'layout')`, so the cached globals and any prerendered page pick up the seed.
+- `src/engine/seed/` reads `templates/<t>/seed/*.yaml`, uploads `seed/media/*` with `payload.create({ collection: 'media', filePath })`, creates forms, creates pages in two passes (first without link references, then updates them), then sets the globals. Every section's data is validated against the section's fields before writing. Markdown in the seed becomes rich text through the target field's own editor (`editorConfigFactory.fromField`), so a value only holds nodes that field supports.
 - The hand-written seed documents (`home.ts`, `contact-page.ts`, `contact-form.ts`, `image-*.ts`, `post-*.ts`) go in phase 5; posts and their images move to a template-agnostic `seed/posts.yaml` under `src/engine/seed/` since both faces list them.
 
 ### `package.json`, `.gitignore`
@@ -125,23 +125,25 @@ pnpm dev
 # in the admin: Seed your database
 ```
 
-`predev` runs the first two automatically when `SITE_TEMPLATE` is set in `.env`. What happens to data: documents created under template-1 remain in the database with block types the new config does not know. The admin shows those blocks as unknown and the frontend skips them. The seeder clears pages, media, forms and globals first (as the stock seed does), so reseeding yields a clean face. Per-request switching is a non-goal ([decisions.md](decisions.md), D13).
+`predev` runs the first two automatically when `SITE_TEMPLATE` is set in `.env`. What happens to data: documents created under template-1 remain in the database with block types the new config does not know. The admin shows those blocks as unknown and the frontend skips them. The seed endpoint clears the content collections first (categories, media, pages, posts, forms, form submissions, search results) and overwrites the header and footer, so reseeding yields a clean face. Files of cleared media stay on disk under `public/media/`, as with the stock seed; a reseed uploads fresh copies under suffixed names. Per-request switching is a non-goal ([decisions.md](decisions.md), D13).
 
 ## 8. Removal in the last phase
 
 Goes, because generated sections cover it:
 
-- `src/blocks/ArchiveBlock`, `CallToAction`, `Content`, `MediaBlock` config (the component stays for posts, see below), `Form/config.ts` and `RenderBlocks.tsx`.
+- `src/blocks/ArchiveBlock`, `CallToAction`, `Content`, `Form` and `RenderBlocks.tsx`.
 - `src/heros/config.ts`, `HighImpact`, `MediumImpact`, `LowImpact`, `RenderHero.tsx`.
 - `src/Header/` and `src/Footer/` entirely, including the two revalidate hooks and row labels.
 - The hand-written seed documents listed in section 3.
-- `src/components/CollectionArchive` and `Card` once nothing imports them (the `List` primitive replaces the archive).
+- `RichText`'s converter for the call-to-action block, which no field can hold any more.
 
 Stays:
 
-- `src/blocks/Banner`, `Code`, `MediaBlock/Component.tsx` and `RelatedPosts`: used by the post body's rich text and the post page.
+- `src/blocks/Banner`, `Code`, `MediaBlock` (config and component: the post body's `BlocksFeature` registers all three) and `RelatedPosts`: used by the post body's rich text and the post page.
 - `src/heros/PostHero`: posts are not sections.
-- `src/blocks/Form/*` field components: moved under the `Form` primitive, not deleted.
+- `src/components/CollectionArchive` and `Card`: the posts index and the search page still render through them; the `List` primitive replaces only the archive block.
+- The form field components (`Checkbox`, `Country`, `Email`, `Message`, `Number`, `Select`, `State`, `Text`, `Textarea`, `Width`, `Error`): they live under `src/engine/primitives/form/`, where the `Form` primitive imports them.
+- `src/fields/linkGroup.ts`: unused once the stock blocks are gone, kept as part of the template's field library.
 - Everything under `src/components/ui`, `Media`, `RichText`, `Link`, providers, utilities.
 
 ## 9. Admin experience

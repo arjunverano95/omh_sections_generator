@@ -130,35 +130,43 @@ Six phases. Each ends in a state that runs and is committed on its own. Phase 2 
 
 ## Development Checklist
 
-- [ ] Phase 0: dependencies pinned, Dockerfile base bumped, stock template runs, baseline checks pass
-- [ ] Phase 1: schemas, compiler, CLI, template-1 compiles, broken-fixture suite, output snapshot, `schema.json`
-- [ ] Phase 2: renderer, seven primitives, Payload helpers, Pages on generated blocks, a generated hero editable and live-previewed
-- [ ] Phase 3: theme.css, fonts.ts, generated globals mounted, template-1 complete as a face
-- [ ] Phase 4: Form and List primitives, latest-posts, generic seeder, template-1 seed
-- [ ] Phase 5: template-2 and seed, switching verified, hand-written blocks and heroes removed, e2e per face, root README
+- [x] Phase 0: dependencies pinned, Dockerfile base bumped, stock template runs, baseline checks pass
+- [x] Phase 1: schemas, compiler, CLI, template-1 compiles, broken-fixture suite, output snapshot, `schema.json`
+- [x] Phase 2: renderer, seven primitives, Payload helpers, Pages on generated blocks, a generated hero editable and live-previewed
+- [x] Phase 3: theme.css, fonts.ts, generated globals mounted, template-1 complete as a face
+- [x] Phase 4: Form and List primitives, latest-posts, generic seeder, template-1 seed
+- [x] Phase 5: template-2 and seed, switching verified, hand-written blocks and heroes removed, e2e per face, root README
 
 ## Verification Checklist
 
-- [ ] `pnpm sections:check` passes for both templates with `--strict`
-- [ ] `pnpm test:int` passes: compiler fixtures, snapshots, renderer, seeder
-- [ ] `pnpm lint`, type check and `pnpm build` pass with each template active
-- [ ] Both faces: seed, home renders, each section editable in the admin, live preview updates, form submits and the submission is in the admin
-- [ ] R8 acceptance: a new section added to each face under `templates/` only, visible in the admin and on a page, with `git status` showing no change under `src/`
-- [ ] R9 lean output: a generated block's fields equal the section's fields; a `list` query's `select` equals its referenced fields; rendered HTML for an empty optional field contains no element for it
-- [ ] No attribution trailers in any commit message
+- [x] `pnpm sections:check` passes for both templates with `--strict` (`template-1: ok`, `template-2: ok`)
+- [ ] `pnpm test:int` passes: compiler fixtures, snapshots, renderer, seeder. 96 tests in 5 files. The compiler, renderer, seeder and Lexical suites are green; the three template-2 snapshot tests compare the shipped folder with its committed output, so they fail while any scratch section sits under `templates/template-2/sections/`. Tick after a run on the folder as committed.
+- [x] `pnpm lint` (0 errors, 8 stock warnings), `tsc --noEmit` and `pnpm build` pass with each template active
+- [x] Both faces: seed, home renders, form submits and the submission is in the admin (the `Sections` e2e suite, 7 of 7 per face); every section of the Launch home lists under Layout in the admin with its label and its fields; Live Preview renders the page beside the form
+- [x] R8 acceptance: a `quote-band.yaml` added under `templates/template-2/sections/` compiled, appeared in the admin's Add Layout drawer under its group, and `git status` showed nothing under `src/`
+- [x] R9 lean output: compiler test "list select derivation: selects exactly what the children reference, plus slug for url"; renderer tests "text with %j renders nothing", "image with an unpopulated upload renders nothing", "button with an empty link or no label renders nothing"; a generated block declares only the section's fields (the template snapshots)
+- [x] No attribution trailers in any commit message
 
 ## Open Issues
 
-- **Payload is a 4.0 pre-release.** The template snapshot imports `@payloadcms/transformer-sharp`, which has no 3.x release, so the project pins `4.0.0-beta.0` rather than patching the template back to 3.x. Everything this spec relies on (`select` on find, block `interfaceName`, component paths with `clientProps`, Lexical, the form-builder plugin) is unchanged between 3.x and 4.0; any API that moved is found at install time and recorded here.
-- **Node base image.** The Dockerfile uses `node:22.17.0-alpine`; `engines` requires `>=24.15.0`. Phase 0 bumps it.
-- **Tailwind source scope.** `@source "../../../templates"` compiles both faces' utilities. Narrowing to the active template needs the directive in a generated file; try `@source` inside the generated `theme.css` imported from `globals.css` and keep the broad directive if it is not honoured there.
+- **Payload is a 4.0 pre-release.** The template snapshot imports `@payloadcms/transformer-sharp`, which has no 3.x release, so the project pins `4.0.0-beta.0` rather than patching the template back to 3.x. Everything this spec relies on (`select` on find, block `interfaceName`, component paths with `clientProps`, Lexical, the form-builder plugin) is unchanged between 3.x and 4.0. One thing moved at install time: TypeScript 6 rejects a slug-typed `CollectionConfig<'pages'>` whose `defaultPopulate` is passed to `buildConfig`, so the Pages config drops the generic; the note in `src/collections/Pages/index.ts` explains it.
+- **Node.** The Dockerfile base is `node:24-alpine` (done in phase 0). The work itself ran on Node 22.15, below the `engines` floor of 24.15; nothing failed, and the floor stands. A clean install on Node 24 is the supported path.
+- **Tailwind source scope.** Kept broad: `globals.css` scans `../../../templates`, so both faces' utilities are compiled into one stylesheet. Narrowing to the active face is still a follow-up.
 - **Fonts at build time.** `next/font/google` downloads at build; an offline build fails. Local font files under `templates/<t>/assets/fonts/` with a `next/font/local` loader is the natural extension and is out of scope.
-- **List revalidation.** Publishing a post does not revalidate pages that list posts. Fix: an `afterChange` on Posts calling `revalidateTag('sections:posts')` and that tag on the `List` query. Small; do it if phase 4 has room.
+- **List revalidation.** Still open. Publishing a post does not revalidate pages that list posts. Fix: an `afterChange` on Posts calling `revalidateTag('sections:posts')` and that tag on the `List` query. Not done in phase 4.
 - **Default colour mode.** `theme.yaml` declares a `light` and a `dark` set but not which one a first-time visitor gets; the stock `InitTheme` script decides (saved choice, else system preference, else light). A face "designed dark" therefore shows its light set to a light-OS visitor. The follow-up is an optional `defaultMode` in the theme file, emitted as a generated constant that `InitTheme` reads ahead of the system preference; it touches `src/providers/Theme`, which this plan otherwise leaves alone, so it is out of scope.
 - **Mobile navigation.** The generated header has no client-side menu. A config-only `details`/`summary` disclosure, or a `nav` primitive with a built-in toggle, is the follow-up.
 - **Unknown block types after a switch.** Pages authored under the other template keep rows the active config cannot edit. The demo reseeds; a real deployment would pin a template per environment.
-- **`home-static` fallback.** Replaced by a seed-derived fallback in phase 2; until then an unseeded database shows the stock static home.
+- **Unseeded home page.** Done in phase 2: `[slug]/page.tsx` falls back to the rows of the active template's `seed/pages.yaml` when no `home` page exists, so a fresh database shows the face before the first seed. The stock `home-static` is gone.
+- **Lexical is bundled once per Next server layer.** `getPayload` caches one instance for every layer, so a route handler that converts Markdown with editors taken from `payload.config` fails with "is not a constructor that subclasses LexicalNode" once the admin layer has initialised. The seeder therefore builds its converter from the `config` its caller imports (`editorConfigFactory.fromField`), and the seed route passes its own. Any new server-side Lexical conversion needs the same care.
+- **Media files on reseed.** The seeder clears collections through the database adapter, so the documents go but the files under `public/media/` stay, and the next seed uploads them again with `-1`, `-2` suffixes. This is how the template's own seed behaved; harmless locally, and a deployment that reseeds would clear the folder first.
+- **Playwright and the tsx loader.** `test:e2e` has always run Playwright under `--import=tsx/esm`. With Playwright 1.63 that hook conflicts with Playwright's own TypeScript ESM loader and the config fails to load, so the script also sets `PW_DISABLE_TS_ESM=1`.
+- **Browser binary for e2e.** Playwright 1.63 wants Chromium build 1243. `playwright install chromium` timed out against the Playwright CDN on the network the work was done on; the same archive from a public mirror, unpacked into Playwright's browsers folder, works. A normal network will not see this.
+- **`AGENTS.md`.** `next dev` on Next 16 appends a `nextjs-agent-rules` block to `AGENTS.md`. It is committed as Next wrote it; `agentRules: false` in `next.config.ts` turns the behaviour off.
+- **Seed types shim.** `src/engine/seed/types.ts` only re-exports the seed schema's inferred types under the seeder's names. Callers could import from `src/engine/schema/seed.ts` directly and the file could go.
 
 ## Current Status
 
-Not started. Specification written 2026-10-12 against the base commit (Payload website template at upstream `b103a85`). Next: phase 0.
+Built. Specification written 2026-10-12 against the base commit (Payload website template at upstream `b103a85`); all six phases landed on `dev` by 2026-10-13. Both faces compile under `--strict`, build, seed from the admin, render, submit their form and pass the e2e suite. The stock page blocks, heroes, header, footer and seed documents are removed in their own commit so the removal can be reverted on its own.
+
+Verified on 2026-10-13: the checklists above. Still to do, in order: run `pnpm test:int` on the templates folder exactly as committed and tick its line; push `dev`; then the open issues above, of which list revalidation and the mobile navigation are the two a real site would want first.
