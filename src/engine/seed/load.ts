@@ -22,7 +22,8 @@ export async function readSeedFile<T>(file: string, fallback: T): Promise<T> {
 
 export type TemplateSeed = {
   pages: SeedPage[]
-  globals: SeedGlobals
+  /** Partial because a missing globals.yaml seeds no global. */
+  globals: Partial<SeedGlobals>
   forms: SeedForm[]
   alts: SeedMediaAlts
   mediaDir: string
@@ -32,7 +33,7 @@ export async function loadTemplateSeed(templateDir: string): Promise<TemplateSee
   const seedDir = path.join(templateDir, 'seed')
   const [pages, globals, forms, alts] = await Promise.all([
     readSeedFile<SeedPage[]>(path.join(seedDir, 'pages.yaml'), []),
-    readSeedFile<SeedGlobals>(path.join(seedDir, 'globals.yaml'), {}),
+    readSeedFile<Partial<SeedGlobals>>(path.join(seedDir, 'globals.yaml'), {}),
     readSeedFile<SeedForm[]>(path.join(seedDir, 'forms.yaml'), []),
     readSeedFile<SeedMediaAlts>(path.join(seedDir, 'media.yaml'), {}),
   ])

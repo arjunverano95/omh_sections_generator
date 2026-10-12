@@ -17,13 +17,11 @@ function toText(value: unknown): string | undefined {
   return value
 }
 
-/** A select's option labels, emitted only where they differ from the stored values. */
-type LabelledTextNode = TextNode & { labels?: Record<string, string> }
-
-export function Text({ node, scope }: PrimitiveProps<LabelledTextNode>) {
+export function Text({ node, scope }: PrimitiveProps<TextNode>) {
   const value = isRef(node.source) ? resolve(node.source, scope) : node.source.value
   if (isEmpty(value)) return null
 
+  // `labels` is present only for a select whose option labels differ from the stored values.
   const text = toText(node.labels?.[String(value)] ?? value)
   if (text === undefined) return null
 

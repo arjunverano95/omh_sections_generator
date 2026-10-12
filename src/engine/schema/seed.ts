@@ -19,12 +19,16 @@ export function parseSeedToken(value: unknown): { kind: SeedTokenKind; key: stri
 const slug = z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, { error: 'slugs are kebab-case' })
 const data = z.record(z.string(), z.unknown())
 
+/** Field values of one section, global or array row, as written in YAML. */
+export type SeedValues = z.infer<typeof data>
+
 /** One entry of a page's `sections` list: `{ <section-name>: { ...fields } }`. */
 export const SeedSectionSchema = z
   .record(z.string(), data)
   .refine((entry) => Object.keys(entry).length === 1, {
     error: 'a seeded section is written { <section-name>: { ...fields } }, one per list item',
   })
+export type SeedSectionRow = z.infer<typeof SeedSectionSchema>
 
 export const SeedPageSchema = z.strictObject({
   slug,
@@ -62,6 +66,7 @@ export const SeedFormFieldSchema = z.looseObject({
   required: z.boolean().optional(),
   width: z.number().optional(),
 })
+export type SeedFormField = z.infer<typeof SeedFormFieldSchema>
 
 export const SeedFormSchema = z.strictObject({
   key: z.string().regex(/^[a-z][a-zA-Z0-9-]*$/, { error: 'a form key is an identifier' }),
