@@ -28,13 +28,25 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   projects: [
+    // The Sections suite seeds the site, which clears the content collections and
+    // signs in as the shared test user, so it runs on its own before the other suites.
+    {
+      name: 'sections',
+      testMatch: /sections\.e2e\.spec\.ts$/,
+      use: { ...devices['Desktop Chrome'], channel: 'chromium' },
+    },
     {
       name: 'chromium',
+      testIgnore: /sections\.e2e\.spec\.ts$/,
+      dependencies: ['sections'],
       use: { ...devices['Desktop Chrome'], channel: 'chromium' },
     },
   ],
   webServer: {
     command: 'pnpm build && pnpm start',
+    // The runner loads its specs through tsx; the site build does not want that
+    // loader, and pnpm refuses to run under it.
+    env: { NODE_OPTIONS: '--no-deprecation' },
     reuseExistingServer: true,
     timeout: 5 * 60 * 1000,
     url: 'http://localhost:3000',

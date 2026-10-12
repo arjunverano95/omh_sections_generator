@@ -4,14 +4,17 @@ import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayload, type RequiredDataFromCollectionSlug } from 'payload'
 import { draftMode } from 'next/headers'
+import path from 'node:path'
 import React, { cache } from 'react'
-import { homeStatic } from '@/endpoints/seed/home-static'
 
-import { RenderBlocks } from '@/blocks/RenderBlocks'
-import { RenderHero } from '@/heros/RenderHero'
+import { RenderSections } from '@/engine/render/RenderSections'
+import { getHomeFallback } from '@/engine/seed/fallback'
+import { manifest } from '@/generated/sections/manifest'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+
+type PageDoc = RequiredDataFromCollectionSlug<'pages'>
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -49,33 +52,32 @@ export default async function Page({ params: paramsPromise }: Args) {
   // Decode to support slugs with special characters
   const decodedSlug = decodeURIComponent(slug)
   const url = '/' + decodedSlug
-  let page: RequiredDataFromCollectionSlug<'pages'> | null
+  let page: PageDoc | null
 
   page = await queryPageBySlug({
     slug: decodedSlug,
   })
 
-  // Remove this code once your website is seeded
+  // An unseeded database shows the home page of templates/seed/pages.yaml, read from the seed files.
   if (!page && slug === 'home') {
-    page = homeStatic
+    page = await homeFallback()
   }
 
   if (!page) {
     return <PayloadRedirects url={url} />
   }
 
-  const { hero, layout } = page
+  const { layout } = page
 
   return (
-    <article className="pt-16 pb-24">
+    <article>
       <PageClient />
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
 
       {draft && <LivePreviewListener />}
 
-      <RenderHero {...hero} />
-      <RenderBlocks blocks={layout} />
+      <RenderSections blocks={layout} />
     </article>
   )
 }
@@ -111,4 +113,11 @@ const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
   })
 
   return result.docs?.[0] || null
+})
+
+const homeFallback = cache(async (): Promise<PageDoc | null> => {
+  const layout = await getHomeFallback(path.resolve(process.cwd(), 'templates'), manifest)
+  if (layout.length === 0) return null
+  // Rows come from seed/pages.yaml, whose values the seeder checks against the section fields.
+  return { title: 'Home', slug: 'home', layout: layout as unknown as PageDoc['layout'] }
 })

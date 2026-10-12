@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=../schema.json
+name: latest-posts
+label: Latest posts
+description: The three most recent posts, optionally from one category.
+group: Blog
+
+fields:
+  heading: text
+  category:
+    type: relation
+    to: categories
+    help: Leave empty to list posts from every category.
+  allPostsLink: link
+
+layout:
+  - div: container flex flex-col gap-10 py-20
+    as: section
+    children:
+      - div: flex flex-wrap items-end justify-between gap-4
+        children:
+          - text: heading
+            as: h2
+            variant: heading.section
+          - button: allPostsLink
+            variant: button.link
+            if: allPostsLink
+      - list:
+          collection: posts
+          limit: 3
+          sort: -publishedAt
+          where:
+            categories:
+              in: { field: category }
+        as: ul
+        class: grid gap-8 md:grid-cols-3
+        children:
+          - div: flex flex-col gap-4
+            as: li
+            children:
+              - image: meta.image
+                class: aspect-video w-full rounded-md object-cover
+                sizes: "(min-width: 768px) 33vw, 100vw"
+              - text: publishedAt
+                as: small
+                class: text-xs uppercase tracking-widest text-muted-foreground
+              - text: title
+                as: h3
+                class: font-heading text-2xl leading-snug
+              - button: { label: Read, href: url }
+                variant: button.link

@@ -1,0 +1,6 @@
+# pnpm 10+ reads its settings from here; the "pnpm" field in package.json is ignored.
+# Dependencies allowed to run install scripts (pnpm 11 form).
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true

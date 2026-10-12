@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=../../../../templates/schema.json
+siteName: Minimal
+fonts:
+  sans: Inter
+
+colors:
+  light:
+    background: oklch(99% 0 0deg)
+    foreground: oklch(20% 0 0deg)
+    primary: oklch(45% 0.1 255deg)
+    primary-foreground: oklch(98% 0 0deg)
+
+radius: 0.5rem
+
+variants:
+  heading:
+    title: text-3xl font-semibold

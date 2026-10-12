@@ -10,6 +10,11 @@ next-env.d.ts
 # Payload default media upload directory
 public/media/
 
+# Sections engine: compiler output and copied block previews
+src/generated/
+public/sections/
+tsconfig.tsbuildinfo
+
 public/robots.txt
 public/sitemap*.xml
 

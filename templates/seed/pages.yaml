@@ -1,0 +1,212 @@
+# yaml-language-server: $schema=../schema.json
+- slug: home
+  title: Home
+  meta:
+    title: Studio
+    description: An editorial studio for brands that want to be read, not skimmed.
+    image: "@media/hero.jpg"
+  sections:
+    - hero-split:
+        eyebrow: Editorial design studio
+        heading: Work that reads well.
+        description: We design websites, publications and identities for brands that would rather be read than skimmed.
+        primaryButton: { type: reference, reference: "@page/contact", label: Start a project }
+        secondaryButton: { type: custom, url: /posts, label: Read the journal }
+        image: "@media/hero.jpg"
+    - features:
+        heading: What we do
+        intro: Three disciplines, one team, and a habit of writing everything down.
+        columns: "3"
+        items:
+          - icon: pen-tool
+            title: Editorial design
+            text: Layouts and type systems that make long reading feel short.
+          - icon: layout-grid
+            title: Websites
+            text: Fast, accessible sites on a CMS your editors will actually enjoy.
+          - icon: palette
+            title: Identity
+            text: Marks, palettes and voice that hold together across every surface.
+    - latest-posts:
+        heading: From the journal
+        category: "@category/technology"
+        allPostsLink: { type: custom, url: /posts, label: All posts }
+    - testimonial:
+        quote: |
+          Studio gave us a site our editors **love** to publish on. Six months in, nobody has asked for a developer.
+        name: Mara Lindqvist
+        role: Editor in chief, Northlight
+        avatar: "@media/avatar.jpg"
+    - contact:
+        heading: Say hello
+        text: Tell us about the project, the timeline and who you are writing for.
+        form: "@form/contact"
+
+- slug: services
+  title: Services
+  meta:
+    title: Services
+    description: Design sprints, monthly retainers and yearly partnerships from Studio.
+  sections:
+    - hero-centered:
+        badge: Services
+        heading: Design by the sprint or by the season.
+        description: We work in fixed-scope sprints for a single project and in monthly retainers for teams that publish every week.
+        bullets:
+          - { icon: calendar, text: "Fixed scope, fixed fee" }
+          - { icon: pen-tool, text: Senior designers only }
+          - { icon: book-open, text: Everything written down }
+        primaryButton: { type: reference, reference: "@page/contact", label: Start a project }
+        secondaryButton: { type: reference, reference: "@page/home", label: See the work }
+        backgroundImage: "@media/services-hero.jpg"
+
+    - logo-strip:
+        heading: Trusted by editors at
+        logos:
+          - { name: Northlight, image: "@media/logo-northlight.jpg" }
+          - { name: Fernhall, image: "@media/logo-fernhall.jpg" }
+          - { name: Ashgrove Press, image: "@media/logo-ashgrove-press.jpg" }
+          - { name: Meridian Quarterly, image: "@media/logo-meridian-quarterly.jpg" }
+          - { name: Kestrel & Vane, image: "@media/logo-kestrel-and-vane.jpg" }
+          - { name: Halden Review, image: "@media/logo-halden-review.jpg" }
+
+    - feature-rows:
+        rows:
+          - title: We start by reading
+            body: |
+              Every project opens with a week of reading: your archive, your analytics and the people who write for you. The **brief** we hand back is short enough to read in one sitting.
+            image: "@media/how-we-work-reading.jpg"
+            reverse: false
+          - title: We design in the browser
+            body: |
+              Layouts become working pages from the second week, so your editors test real articles on real screens long before go-live.
+            image: "@media/how-we-work-browser.jpg"
+            reverse: true
+          - title: We hand over the keys
+            body: |
+              Go-live comes with a style guide, a walkthrough of the CMS and a month of support. After that the site is yours to run.
+            image: "@media/how-we-work-handover.jpg"
+            reverse: false
+
+    - pricing:
+        heading: Ways to work with us
+        plans:
+          - name: Sprint
+            price: 4800
+            period: month
+            features:
+              - { text: One focused deliverable }
+              - { text: Four weeks from brief to go-live }
+              - { text: Two rounds of revisions }
+            button: { type: reference, reference: "@page/contact", label: Book a sprint }
+            highlighted: false
+          - name: Retainer
+            price: 3200
+            period: month
+            features:
+              - { text: A senior designer two days a week }
+              - { text: A monthly editorial review }
+              - { text: Design system upkeep }
+              - { text: Priority turnaround }
+            button: { type: reference, reference: "@page/contact", label: Start a retainer }
+            highlighted: true
+          - name: Partner
+            price: 36000
+            period: year
+            features:
+              - { text: Everything in Retainer }
+              - { text: One section redesigned each quarter }
+              - { text: A yearly brand review }
+            button: { type: reference, reference: "@page/contact", label: Talk to us }
+            highlighted: false
+
+    - cta-band:
+        heading: Not sure which fits?
+        text: Tell us what you publish and how often. We will suggest a package in one reply.
+        button: { type: reference, reference: "@page/contact", label: Start a project }
+
+    - newsletter:
+        heading: Notes from the studio
+        text: One letter a month on type, layout and the work behind it. Unsubscribe in one click.
+        form: "@form/newsletter"
+
+- slug: about
+  title: About
+  meta:
+    title: About
+    description: Who Studio is, how we work and what to expect when we work together.
+    image: "@media/about.jpg"
+  sections:
+    - hero-cover:
+        eyebrow: About
+        heading: A small studio that writes things down.
+        description: Four people, one long table and a shared conviction that good design starts with reading the brief properly.
+        button: { type: reference, reference: "@page/contact", label: Work with us }
+        image: "@media/about.jpg"
+    - stats:
+        heading: Studio in numbers
+        intro: Small on purpose, and busy enough to stay sharp.
+        items:
+          - value: "12"
+            label: Years in practice
+          - value: 140+
+            label: Projects shipped
+          - value: "4"
+            label: People at the table
+          - value: "3"
+            label: Cities we work from
+    - team:
+        heading: The people
+        intro: Everyone here designs, everyone here writes, and everyone answers the phone.
+        members:
+          - photo: "@media/team-ines.jpg"
+            name: Ines Okafor
+            role: Founder and creative director
+          - photo: "@media/team-tomas.jpg"
+            name: Tomas Reyes
+            role: Design lead
+          - photo: "@media/team-hana.jpg"
+            name: Hana Sato
+            role: Editorial strategist
+          - photo: "@media/team-leo.jpg"
+            name: Leo Marchetti
+            role: Developer
+    - faq:
+        heading: Questions we hear
+        intro: If yours is not here, ask it on the contact page.
+        items:
+          - question: How long does a project take?
+            answer: |
+              A website usually takes **eight to twelve weeks** from the first call to the day it goes live. An identity takes four to six. We agree the dates before we start and keep to them.
+          - question: Do you work with in-house teams?
+            answer: |
+              Often. We are happiest sitting beside your editors and developers, and we hand over everything we make: files, type specimens, the CMS and the notes behind each decision.
+          - question: Which CMS do you build on?
+            answer: |
+              Payload, for most sites. It lets us shape the editing experience around how your team actually writes, rather than around a theme.
+          - question: Can you write the copy as well?
+            answer: |
+              Yes. Editorial strategy is one of the three things we do, and the work goes better when words and layout are drafted together.
+          - question: What does a project cost?
+            answer: |
+              It depends on scope, so we quote after the first call. Most websites land between a small brand refresh and a full publication; we will tell you plainly where yours sits.
+    - testimonial:
+        quote: |
+          They asked better questions about our readers than we had ever asked ourselves. The site followed from the answers.
+        name: Daniel Achebe
+        role: Publisher, Fieldnotes Quarterly
+
+- slug: contact
+  title: Contact
+  meta:
+    title: Contact
+    description: Start a project with Studio.
+  sections:
+    - hero-simple:
+        eyebrow: Contact
+        heading: Let's make something people read.
+        description: Most projects start with a short call. Write to us below and we will set one up.
+    - contact:
+        heading: Project enquiry
+        text: We reply to every message within two working days.
+        form: "@form/contact"

@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=../schema.json
+name: stats
+label: Stats
+plural: Stats
+description: A heading, an intro and two to four large figures with a label under each.
+group: Content
+
+fields:
+  heading: text
+  intro: textarea
+  items:
+    type: array
+    min: 2
+    max: 4
+    rowLabel: label
+    fields:
+      value:
+        type: text
+        required: true
+        help: The figure as it should read, such as 12, 140+ or 98%.
+      label:
+        type: text
+        required: true
+
+layout:
+  - div: border-y border-border
+    as: section
+    children:
+      - div: container flex flex-col gap-12 py-20
+        children:
+          - div: flex max-w-2xl flex-col gap-4
+            if: heading
+            children:
+              - text: heading
+                as: h2
+                variant: heading.section
+              - text: intro
+                variant: text.lead
+                if: intro
+          - each: items
+            as: ul
+            class: grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4
+            children:
+              - div: flex flex-col gap-2 border-l border-border pl-5
+                as: li
+                children:
+                  - text: value
+                    as: strong
+                    class: font-heading text-5xl font-normal tracking-tight text-primary md:text-6xl
+                  - text: label
+                    as: span
+                    class: text-sm text-muted-foreground

@@ -1,0 +1,3 @@
+file: sections/hero.yaml
+path: "layout[0].children[0].variant"
+message: "heading.display"

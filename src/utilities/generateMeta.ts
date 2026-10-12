@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import type { Media, Page, Post, Config } from '../payload-types'
 
+import { manifest } from '@/generated/sections/manifest'
 import { mergeOpenGraph } from './mergeOpenGraph'
 import { getServerSideURL } from './getURL'
 
@@ -26,9 +27,10 @@ export const generateMeta = async (args: {
 
   const ogImage = getImageURL(doc?.meta?.image)
 
-  const title = doc?.meta?.title
-    ? doc?.meta?.title + ' | Payload Website Template'
-    : 'Payload Website Template'
+  const metaTitle = doc?.meta?.title
+  // A page whose meta title is the site name itself gets the name once, not "Studio | Studio".
+  const title =
+    metaTitle && metaTitle !== manifest.siteName ? `${metaTitle} | ${manifest.siteName}` : manifest.siteName
 
   return {
     description: doc?.meta?.description,

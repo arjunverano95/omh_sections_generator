@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../schema.json
+- key: contact
+  title: Contact
+  submitButtonLabel: Send message
+  confirmationType: message
+  confirmationMessage: Thanks for writing. We will be in touch within two working days.
+  fields:
+    - { blockType: text, name: name, label: Name, required: true, width: 50 }
+    - { blockType: email, name: email, label: Email, required: true, width: 50 }
+    - { blockType: textarea, name: message, label: Message, required: true }
+
+- key: newsletter
+  title: Newsletter
+  submitButtonLabel: Subscribe
+  confirmationType: message
+  confirmationMessage: You are on the list. The next letter arrives at the start of the month.
+  fields:
+    - { blockType: email, name: email, label: Email, required: true }

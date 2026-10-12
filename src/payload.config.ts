@@ -9,8 +9,7 @@ import { Media, mediaSharpOptions } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
-import { Footer } from './Footer/config'
-import { Header } from './Header/config'
+import { globals } from '@/generated/sections/globals'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -83,7 +82,8 @@ export default buildConfig({
     Users,
   ],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer],
+  // The header and footer, compiled from templates/globals.
+  globals,
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   typescript: {

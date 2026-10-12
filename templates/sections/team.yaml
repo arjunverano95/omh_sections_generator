@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=../schema.json
+name: team
+label: Team
+plural: Teams
+description: A heading, an intro and a grid of people with a photo, name and role.
+group: Social proof
+
+fields:
+  heading: text
+  intro: textarea
+  members:
+    type: array
+    max: 8
+    rowLabel: name
+    fields:
+      photo:
+        type: image
+        help: Square works best.
+      name:
+        type: text
+        required: true
+      role: text
+
+layout:
+  - div: container flex flex-col gap-12 py-20
+    as: section
+    children:
+      - div: flex max-w-2xl flex-col gap-4
+        if: heading
+        children:
+          - text: heading
+            as: h2
+            variant: heading.section
+          - text: intro
+            variant: text.lead
+            if: intro
+      - each: members
+        as: ul
+        class: grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4
+        children:
+          - div: flex flex-col gap-4
+            as: li
+            children:
+              - image: photo
+                class: aspect-square w-full rounded-lg bg-muted object-cover
+                sizes: "(min-width: 768px) 25vw, 50vw"
+                if: photo
+              - div: flex flex-col gap-1
+                children:
+                  - text: name
+                    as: h3
+                    class: font-heading text-xl
+                  - text: role
+                    class: text-sm text-muted-foreground
+                    if: role
