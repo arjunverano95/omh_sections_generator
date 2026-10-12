@@ -84,7 +84,13 @@ The theme's `siteName` comes through the generated manifest. It is the title suf
 
 ### Colour mode
 
-The theme's `colorMode` comes through the generated manifest too. The frontend's theme script under `src/providers/Theme` reads it: `light` or `dark` sets that palette for every visitor, `system` follows the device setting. There is no admin setting and no visitor switch.
+The theme's `colorMode` comes through the generated manifest too (`COLOR_MODES` and `ColorMode` in `src/engine/manifest.ts`; the compiler fills in `system` when the theme sets none). `src/app/(frontend)/layout.tsx` reads `manifest.colorMode` and passes it to `InitTheme` and to `Providers`, which hands it to `ThemeProvider`:
+
+- `src/providers/Theme/InitTheme/index.tsx`: the before-paint script takes a `colorMode` prop. `light` or `dark` is set outright; `system` uses a stored choice when there is one, else the device setting.
+- `src/providers/Theme/index.tsx`: `ThemeProvider` takes the same prop and its effect follows the same order.
+- `src/providers/index.tsx`: passes the prop through.
+
+`HeaderTheme` and the rest of `src/providers` are unchanged. There is no admin setting and no visitor switch.
 
 ### `src/engine/payload/`
 
@@ -142,7 +148,7 @@ Stays:
 - `src/components/CollectionArchive` and `Card`: the posts index and the search page render through them; the `List` primitive replaces only the archive block.
 - The form field components (`Checkbox`, `Country`, `Email`, `Message`, `Number`, `Select`, `State`, `Text`, `Textarea`, `Width`, `Error`): they live under `src/engine/primitives/form/`, where the `Form` primitive imports them.
 - `src/fields/linkGroup.ts`: unused by the generated blocks, kept as part of the stock field library.
-- Everything under `src/components/ui`, `Media`, `RichText`, `Link`, providers (the theme script reads `colorMode`), utilities.
+- Everything under `src/components/ui`, `Media`, `RichText`, `Link`, providers (the theme providers take `colorMode`), utilities.
 
 ## 8. Admin experience
 

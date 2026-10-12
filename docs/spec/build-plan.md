@@ -31,7 +31,8 @@ BLAST:     src/engine/** (new); src/generated/** (new, ignored); templates/** (n
            src/app/(frontend)/layout.tsx, [slug]/page.tsx, globals.css; src/endpoints/seed/**;
            the site-name consumers (src/plugins/index.ts, src/utilities/generateMeta.ts,
            src/utilities/mergeOpenGraph.ts, the posts and search page titles, the seed button);
-           the theme script under src/providers/Theme (colorMode from the manifest);
+           src/providers/Theme/{InitTheme/index.tsx,index.tsx} and src/providers/index.tsx
+           (colorMode from the manifest);
            package.json, pnpm-lock.yaml, .gitignore, .nvmrc, Dockerfile (node base);
            src/payload-types.ts, src/app/(payload)/admin/importMap.js (regenerated);
            phase 4 only: removal of src/blocks/{ArchiveBlock,CallToAction,Content,Form,RenderBlocks.tsx},
@@ -124,7 +125,7 @@ Six phases. Each ends in a state that runs and is committed on its own. Phase 2 
 - `src/collections/Pages/index.ts`, `src/payload.config.ts`
 - `src/app/(frontend)/layout.tsx`, `src/app/(frontend)/[slug]/page.tsx`, `src/app/(frontend)/globals.css`
 - `src/endpoints/seed/index.ts`
-- the site-name consumers and the theme script listed in BLAST
+- the site-name consumers and the theme providers listed in BLAST
 - `src/payload-types.ts`, `src/app/(payload)/admin/importMap.js`
 - `package.json`, `pnpm-lock.yaml`, `.gitignore`, `Dockerfile`
 - `tests/int/engine/**`, `tests/fixtures/templates/**`, `tests/e2e/**`
