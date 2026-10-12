@@ -65,7 +65,7 @@ export const Pages: CollectionConfig = {
             {
               name: 'layout',
               type: 'blocks',
-              // One block per section of the active template; a hero is a section like any other.
+              // One block per section under templates/sections; a hero is a section like any other.
               blocks,
               required: true,
               admin: {

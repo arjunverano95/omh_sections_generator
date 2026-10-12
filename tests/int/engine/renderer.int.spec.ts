@@ -610,7 +610,7 @@ describe('end to end', () => {
 
     const seed = {
       id: 'row1',
-      blockType: 'template-1-hero-split',
+      blockType: 'hero-split',
       eyebrow: 'Studio',
       heading: 'Small studio, careful work',
       description: paragraph('We build websites that stay out of the way.'),

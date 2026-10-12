@@ -30,7 +30,7 @@ export const generateMeta = async (args: {
   const metaTitle = doc?.meta?.title
   // A page whose meta title is the site name itself gets the name once, not "Studio | Studio".
   const title =
-    metaTitle && metaTitle !== manifest.label ? `${metaTitle} | ${manifest.label}` : manifest.label
+    metaTitle && metaTitle !== manifest.siteName ? `${metaTitle} | ${manifest.siteName}` : manifest.siteName
 
   return {
     description: doc?.meta?.description,

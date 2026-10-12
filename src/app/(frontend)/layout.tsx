@@ -13,7 +13,7 @@ import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { draftMode } from 'next/headers'
 
 import './globals.css'
-// The active template's tokens: fonts, colours and radius, over the defaults in globals.css.
+// The theme's tokens: fonts, colours and radius, over the defaults in globals.css.
 import '@/generated/sections/theme.css'
 import { getServerSideURL } from '@/utilities/getURL'
 

@@ -82,7 +82,7 @@ export default buildConfig({
     Users,
   ],
   cors: [getServerSideURL()].filter(Boolean),
-  // The header and footer of the active template, compiled from templates/<name>/globals.
+  // The header and footer, compiled from templates/globals.
   globals,
   plugins,
   secret: process.env.PAYLOAD_SECRET,

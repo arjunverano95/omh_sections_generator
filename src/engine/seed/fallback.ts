@@ -1,6 +1,6 @@
 /**
- * The unseeded-home fallback: the active template's seeded home page as block rows, built
- * without a database. Nothing exists to point at, so media, forms and categories are left
+ * The unseeded-home fallback: the seeded home page of `templates/seed/pages.yaml` as block
+ * rows, built without a database. Nothing exists to point at, so media, forms and categories are left
  * out, internal links become plain URLs, and rich text becomes plain paragraphs.
  */
 import path from 'node:path'
@@ -16,8 +16,8 @@ export type FallbackRow = { id: string; blockType: string; blockName: null } & R
 /** Thrown inside resolution to drop a value that needs a document. */
 const SKIP = Symbol('skip')
 
-export async function getHomeFallback(templateDir: string, manifest: Manifest): Promise<FallbackRow[]> {
-  const pages = await readSeedFile<SeedPage[]>(path.join(templateDir, 'seed', 'pages.yaml'), [])
+export async function getHomeFallback(templatesDir: string, manifest: Manifest): Promise<FallbackRow[]> {
+  const pages = await readSeedFile<SeedPage[]>(path.join(templatesDir, 'seed', 'pages.yaml'), [])
   const home = pages.find((page) => page.slug === 'home')
   if (!home) return []
 

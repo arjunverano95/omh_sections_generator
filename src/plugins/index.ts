@@ -15,7 +15,7 @@ import { manifest } from '@/generated/sections/manifest'
 import { getServerSideURL } from '@/utilities/getURL'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | ${manifest.label}` : manifest.label
+  return doc?.title ? `${doc.title} | ${manifest.siteName}` : manifest.siteName
 }
 
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {

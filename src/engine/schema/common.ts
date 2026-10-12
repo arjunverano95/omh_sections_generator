@@ -4,10 +4,8 @@
 
 /** Field names become Payload field names, TypeScript properties and GraphQL names. */
 export const FIELD_NAME_RE = /^[a-z][a-zA-Z0-9]*$/
-/** Section names become the block-slug suffix. */
+/** Section names are block slugs. */
 export const SECTION_NAME_RE = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/
-/** Template names are folder names and the block-slug prefix. */
-export const TEMPLATE_NAME_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/
 /** A CSS length for `radius`: a number with a unit, or a bare `0`. */
 export const CSS_LENGTH_RE = /^(0|-?(\d+|\d*\.\d+)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex|cap|ic|lh|rlh))$/
 
@@ -65,10 +63,9 @@ export function toLabel(name: string): string {
   return words.charAt(0).toUpperCase() + words.slice(1)
 }
 
-/** `template-1` + `hero-split` to `Template1HeroSplit`. */
-export function toPascalCase(...parts: string[]): string {
-  return parts
-    .join('-')
+/** `hero-split` to `HeroSplit`. */
+export function toPascalCase(name: string): string {
+  return name
     .split(/[^a-zA-Z0-9]+/)
     .filter(Boolean)
     .map((part) => part[0]!.toUpperCase() + part.slice(1))

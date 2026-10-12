@@ -1,8 +1,0 @@
-# yaml-language-server: $schema=../../../../../templates/schema.json
-name: 04-select-without-options
-label: Minimal
-theme: ./theme.yaml
-globals:
-  header: ./globals/header.yaml
-  footer: ./globals/footer.yaml
-sections: ./sections

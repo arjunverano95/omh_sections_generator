@@ -82,7 +82,7 @@ export const SeedButton: React.FC = () => {
   return (
     <Fragment>
       <button className="seedButton" onClick={handleClick}>
-        Seed your database with {manifest.label}
+        Seed your database with {manifest.siteName}
       </button>
       {message}
     </Fragment>

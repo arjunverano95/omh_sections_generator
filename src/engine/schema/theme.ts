@@ -30,9 +30,10 @@ export const VariantsSchema = z.record(
   ),
 )
 
-/** `templates/<name>/theme.yaml` */
+/** `templates/theme.yaml` */
 export const ThemeSchema = z.strictObject({
   kind: z.literal('theme').optional(),
+  siteName: z.string().min(1, { error: 'siteName is the name of the site, shown in page titles' }),
   fonts: z.strictObject({
     sans: FontSpecSchema,
     heading: FontSpecSchema.optional(),

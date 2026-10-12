@@ -13,7 +13,7 @@ test.describe('Frontend', () => {
     page = await context.newPage()
   })
 
-  // The home page is the active template's seeded home; sections.e2e.spec.ts covers it.
+  // The home page is the seeded home of templates/seed/pages.yaml; sections.e2e.spec.ts covers it.
 
   test.describe('post detail', () => {
     test.beforeAll(async () => {

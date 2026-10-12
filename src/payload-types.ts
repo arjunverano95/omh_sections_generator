@@ -157,8 +157,8 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
-    header: Template1Header;
-    footer: Template1Footer;
+    header: Header;
+    footer: Footer;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
@@ -267,13 +267,7 @@ export interface User {
 export interface Page {
   id: string;
   title: string;
-  layout: (
-    | Template1ContactBlock
-    | Template1FeaturesBlock
-    | Template1HeroSplitBlock
-    | Template1LatestPostsBlock
-    | Template1TestimonialBlock
-  )[];
+  layout: (ContactBlock | FeaturesBlock | HeroSplitBlock | LatestPostsBlock | TestimonialBlock)[];
   meta?: {
     title?: string | null;
     /**
@@ -298,15 +292,15 @@ export interface Page {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Template1ContactBlock".
+ * via the `definition` "ContactBlock".
  */
-export interface Template1ContactBlock {
+export interface ContactBlock {
   heading?: string | null;
   text?: string | null;
   form: string | Form;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'template-1-contact';
+  blockType: 'contact';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -474,9 +468,9 @@ export interface Textarea {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Template1FeaturesBlock".
+ * via the `definition` "FeaturesBlock".
  */
-export interface Template1FeaturesBlock {
+export interface FeaturesBlock {
   heading?: string | null;
   intro?: string | null;
   columns?: ('2' | '3' | '4') | null;
@@ -571,13 +565,13 @@ export interface Template1FeaturesBlock {
     | null;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'template-1-features';
+  blockType: 'features';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Template1HeroSplitBlock".
+ * via the `definition` "HeroSplitBlock".
  */
-export interface Template1HeroSplitBlock {
+export interface HeroSplitBlock {
   eyebrow?: string | null;
   heading: string;
   description?: string | null;
@@ -617,7 +611,7 @@ export interface Template1HeroSplitBlock {
   image?: (string | null) | Media;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'template-1-hero-split';
+  blockType: 'hero-split';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -800,9 +794,9 @@ export interface Category {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Template1LatestPostsBlock".
+ * via the `definition` "LatestPostsBlock".
  */
-export interface Template1LatestPostsBlock {
+export interface LatestPostsBlock {
   heading?: string | null;
   /**
    * Leave empty to list posts from every category.
@@ -825,20 +819,20 @@ export interface Template1LatestPostsBlock {
   };
   id?: string | null;
   blockName?: string | null;
-  blockType: 'template-1-latest-posts';
+  blockType: 'latest-posts';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Template1TestimonialBlock".
+ * via the `definition` "TestimonialBlock".
  */
-export interface Template1TestimonialBlock {
+export interface TestimonialBlock {
   quote: LexicalRichText<LexicalNodes_AD327369>;
   name?: string | null;
   role?: string | null;
   avatar?: (string | null) | Media;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'template-1-testimonial';
+  blockType: 'testimonial';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1191,11 +1185,11 @@ export interface PagesSelect<T extends boolean = true> {
   layout?:
     | T
     | {
-        'template-1-contact'?: T | Template1ContactBlockSelect<T>;
-        'template-1-features'?: T | Template1FeaturesBlockSelect<T>;
-        'template-1-hero-split'?: T | Template1HeroSplitBlockSelect<T>;
-        'template-1-latest-posts'?: T | Template1LatestPostsBlockSelect<T>;
-        'template-1-testimonial'?: T | Template1TestimonialBlockSelect<T>;
+        contact?: T | ContactBlockSelect<T>;
+        features?: T | FeaturesBlockSelect<T>;
+        'hero-split'?: T | HeroSplitBlockSelect<T>;
+        'latest-posts'?: T | LatestPostsBlockSelect<T>;
+        testimonial?: T | TestimonialBlockSelect<T>;
       };
   meta?:
     | T
@@ -1214,9 +1208,9 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Template1ContactBlock_select".
+ * via the `definition` "ContactBlock_select".
  */
-export interface Template1ContactBlockSelect<T extends boolean = true> {
+export interface ContactBlockSelect<T extends boolean = true> {
   heading?: T;
   text?: T;
   form?: T;
@@ -1225,9 +1219,9 @@ export interface Template1ContactBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Template1FeaturesBlock_select".
+ * via the `definition` "FeaturesBlock_select".
  */
-export interface Template1FeaturesBlockSelect<T extends boolean = true> {
+export interface FeaturesBlockSelect<T extends boolean = true> {
   heading?: T;
   intro?: T;
   columns?: T;
@@ -1244,9 +1238,9 @@ export interface Template1FeaturesBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Template1HeroSplitBlock_select".
+ * via the `definition` "HeroSplitBlock_select".
  */
-export interface Template1HeroSplitBlockSelect<T extends boolean = true> {
+export interface HeroSplitBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   description?: T;
@@ -1274,9 +1268,9 @@ export interface Template1HeroSplitBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Template1LatestPostsBlock_select".
+ * via the `definition` "LatestPostsBlock_select".
  */
-export interface Template1LatestPostsBlockSelect<T extends boolean = true> {
+export interface LatestPostsBlockSelect<T extends boolean = true> {
   heading?: T;
   category?: T;
   allPostsLink?:
@@ -1293,9 +1287,9 @@ export interface Template1LatestPostsBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Template1TestimonialBlock_select".
+ * via the `definition` "TestimonialBlock_select".
  */
-export interface Template1TestimonialBlockSelect<T extends boolean = true> {
+export interface TestimonialBlockSelect<T extends boolean = true> {
   quote?: T;
   name?: T;
   role?: T;
@@ -1802,7 +1796,7 @@ export interface PayloadLlmInstructionsSelect<T extends boolean = true> {
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header".
  */
-export interface Template1Header {
+export interface Header {
   id: string;
   logo: string | Media;
   navItems?:
@@ -1855,7 +1849,7 @@ export interface Template1Header {
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "footer".
  */
-export interface Template1Footer {
+export interface Footer {
   id: string;
   columns?:
     | {

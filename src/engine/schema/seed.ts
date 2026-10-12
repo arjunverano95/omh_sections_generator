@@ -84,7 +84,7 @@ export type SeedForm = z.infer<typeof SeedFormSchema>
 /** `seed/forms.yaml` */
 export const SeedFormsSchema = z.array(SeedFormSchema)
 
-/** `src/engine/seed/posts.yaml`: template-agnostic demo posts both faces list. */
+/** `src/engine/seed/posts.yaml`: the demo posts the blog and the latest-posts section list. */
 export const SeedPostSchema = z.strictObject({
   slug,
   title: z.string().min(1),

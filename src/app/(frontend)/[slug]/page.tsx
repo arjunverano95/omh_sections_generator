@@ -58,7 +58,7 @@ export default async function Page({ params: paramsPromise }: Args) {
     slug: decodedSlug,
   })
 
-  // An unseeded database shows the active template's seeded home page, read from its seed files.
+  // An unseeded database shows the home page of templates/seed/pages.yaml, read from the seed files.
   if (!page && slug === 'home') {
     page = await homeFallback()
   }
@@ -116,8 +116,7 @@ const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
 })
 
 const homeFallback = cache(async (): Promise<PageDoc | null> => {
-  const templateDir = path.resolve(process.cwd(), 'templates', manifest.name)
-  const layout = await getHomeFallback(templateDir, manifest)
+  const layout = await getHomeFallback(path.resolve(process.cwd(), 'templates'), manifest)
   if (layout.length === 0) return null
   // Rows come from seed/pages.yaml, whose values the seeder checks against the section fields.
   return { title: 'Home', slug: 'home', layout: layout as unknown as PageDoc['layout'] }

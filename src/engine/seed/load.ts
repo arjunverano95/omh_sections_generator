@@ -20,7 +20,7 @@ export async function readSeedFile<T>(file: string, fallback: T): Promise<T> {
   }
 }
 
-export type TemplateSeed = {
+export type SiteSeed = {
   pages: SeedPage[]
   /** Partial because a missing globals.yaml seeds no global. */
   globals: Partial<SeedGlobals>
@@ -29,8 +29,9 @@ export type TemplateSeed = {
   mediaDir: string
 }
 
-export async function loadTemplateSeed(templateDir: string): Promise<TemplateSeed> {
-  const seedDir = path.join(templateDir, 'seed')
+/** `templates/seed/*.yaml`: the pages, globals, forms and media alt texts of the site. */
+export async function loadSiteSeed(templatesDir: string): Promise<SiteSeed> {
+  const seedDir = path.join(templatesDir, 'seed')
   const [pages, globals, forms, alts] = await Promise.all([
     readSeedFile<SeedPage[]>(path.join(seedDir, 'pages.yaml'), []),
     readSeedFile<Partial<SeedGlobals>>(path.join(seedDir, 'globals.yaml'), {}),
@@ -41,7 +42,7 @@ export async function loadTemplateSeed(templateDir: string): Promise<TemplateSee
 }
 
 /**
- * The template-agnostic demo posts that ship with the engine. Resolved from the working
+ * The demo posts that ship with the engine. Resolved from the working
  * directory rather than `import.meta.url`, which points into the bundle under Next.js.
  */
 export const ENGINE_SEED_DIR = path.resolve(process.cwd(), 'src/engine/seed')

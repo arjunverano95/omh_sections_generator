@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=../../../../templates/schema.json
+siteName: Minimal
 fonts:
   sans: Inter
 

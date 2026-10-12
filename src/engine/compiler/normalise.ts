@@ -82,6 +82,7 @@ export type NFont = {
 }
 
 export type NTheme = {
+  siteName: string
   fonts: { sans: NFont; heading: NFont }
   colors: { light: Partial<Record<ColorSlot, string>>; dark: Partial<Record<ColorSlot, string>> }
   radius?: string
@@ -89,11 +90,8 @@ export type NTheme = {
   file: LoadedFile
 }
 
-export type NormalisedTemplate = {
-  name: string
-  label: string
-  description?: string
-  /** Absolute path of the template folder. */
+export type NormalisedSite = {
+  /** Absolute path of the templates folder. */
   dir: string
   theme: NTheme
   globals: { header: NGlobal; footer: NGlobal }
@@ -128,6 +126,7 @@ export function normaliseTheme(theme: ThemeFile, file: LoadedFile): NTheme {
     return out
   }
   return {
+    siteName: theme.siteName.trim(),
     fonts: { sans, heading },
     colors: { light: pick(theme.colors.light), dark: pick(theme.colors.dark) },
     radius: theme.radius,
@@ -261,7 +260,7 @@ export function toScopeFields(fields: NField[], docPath: PathSegment[] = ['field
   return out
 }
 
-/** The default `plural`: good enough for block counts; a template sets `plural` for the rest. */
+/** The default `plural`: good enough for block counts; a section sets `plural` for the rest. */
 export function pluralise(label: string): string {
   if (/s$/i.test(label)) return label
   if (/[^aeiou]y$/i.test(label)) return `${label.slice(0, -1)}ies`
@@ -269,29 +268,25 @@ export function pluralise(label: string): string {
   return `${label}s`
 }
 
-export function normaliseSection(
-  doc: SectionFile,
-  file: LoadedFile,
-  templateName: string,
-  templateLabel: string,
-  diagnostics: Diagnostics,
-): NSection {
-  const slug = `${templateName}-${doc.name}`
+/** The block drawer group of a section that sets none. */
+export const DEFAULT_GROUP = 'Sections'
+
+export function normaliseSection(doc: SectionFile, file: LoadedFile, diagnostics: Diagnostics): NSection {
   let preview: NPreview | undefined
   if (doc.preview) {
     const source = path.resolve(path.dirname(file.absPath), doc.preview)
     const ext = path.extname(source).toLowerCase()
-    preview = { source, publicPath: `/sections/${templateName}/${doc.name}${ext}` }
+    preview = { source, publicPath: `/sections/${doc.name}${ext}` }
   }
   return {
     kind: 'section',
     name: doc.name,
-    slug,
-    interfaceName: `${toPascalCase(templateName, doc.name)}Block`,
+    slug: doc.name,
+    interfaceName: `${toPascalCase(doc.name)}Block`,
     label: doc.label,
     plural: doc.plural ?? pluralise(doc.label),
     description: doc.description,
-    group: doc.group ?? templateLabel,
+    group: doc.group ?? DEFAULT_GROUP,
     preview,
     fields: normaliseFields(doc.fields, file, diagnostics),
     layout: doc.layout,
@@ -299,17 +294,12 @@ export function normaliseSection(
   }
 }
 
-export function normaliseGlobal(
-  doc: GlobalFile,
-  file: LoadedFile,
-  templateName: string,
-  diagnostics: Diagnostics,
-): NGlobal {
+export function normaliseGlobal(doc: GlobalFile, file: LoadedFile, diagnostics: Diagnostics): NGlobal {
   return {
     kind: 'global',
     name: doc.name,
     slug: doc.name,
-    interfaceName: toPascalCase(templateName, doc.name),
+    interfaceName: toPascalCase(doc.name),
     label: doc.label ?? toLabel(doc.name),
     fields: normaliseFields(doc.fields, file, diagnostics),
     layout: doc.layout,

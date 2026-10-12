@@ -1,7 +1,7 @@
 /**
- * The generic seeder. Reads `templates/<t>/seed/*.yaml` and the engine's demo posts,
- * validates every value against the compiled manifest, then writes: categories, media,
- * posts, forms, pages (two passes so links between pages resolve) and finally the globals.
+ * The generic seeder. Reads `templates/seed/*.yaml` and the engine's demo posts, validates
+ * every value against the compiled manifest, then writes: categories, media, posts, forms,
+ * pages (two passes so links between pages resolve) and finally the globals.
  *
  * Clearing the database is the seed endpoint's job; this module only creates.
  */
@@ -12,7 +12,7 @@ import type { Payload, PayloadRequest, RequiredDataFromCollectionSlug, Sanitized
 import type { GlobalName, Manifest } from '@/engine/manifest'
 
 import { createMarkdownConverter, type MarkdownConverter } from './lexical'
-import { altFor, loadPostsSeed, loadTemplateSeed, type TemplateSeed } from './load'
+import { altFor, loadPostsSeed, loadSiteSeed, type SiteSeed } from './load'
 import { resolveToken, resolveValues, type DocumentId, type ResolveContext } from './resolve'
 import { parseToken, slugify, type TokenKind } from './tokens'
 import type { SeedPage, SeedPost, SeedValues } from './types'
@@ -21,11 +21,11 @@ import { SeedValidationError, validateValues, type SeedIssue } from './validate'
 export { getHomeFallback } from './fallback'
 export { SeedValidationError } from './validate'
 
-export type SeedTemplateArgs = {
+export type SeedSiteArgs = {
   payload: Payload
   req: PayloadRequest
-  /** Absolute path of the active template folder, e.g. `<repo>/templates/template-1`. */
-  templateDir: string
+  /** Absolute path of the templates folder, e.g. `<repo>/templates`. */
+  templatesDir: string
   manifest: Manifest
   /** Folder holding posts.yaml, media.yaml and media/. Defaults to src/engine/seed. */
   postsDir?: string
@@ -47,18 +47,18 @@ export type SeedSummary = {
 
 /** What a seed needs that must exist before anything is written: names, files, slugs. */
 type Plan = {
-  template: TemplateSeed
+  site: SiteSeed
   posts: Awaited<ReturnType<typeof loadPostsSeed>>
-  /** Template media files referenced anywhere, in first-use order. */
-  templateMedia: string[]
+  /** Site media files referenced anywhere, in first-use order. */
+  siteMedia: string[]
   categories: { title: string; slug: string }[]
 }
 
 const NO_REVALIDATE = { disableRevalidate: true }
 
 /** Loads and validates everything; throws SeedValidationError listing every problem. */
-export async function planSeed(templateDir: string, manifest: Manifest, postsDir?: string): Promise<Plan> {
-  const [template, posts] = await Promise.all([loadTemplateSeed(templateDir), loadPostsSeed(postsDir)])
+export async function planSeed(templatesDir: string, manifest: Manifest, postsDir?: string): Promise<Plan> {
+  const [site, posts] = await Promise.all([loadSiteSeed(templatesDir), loadPostsSeed(postsDir)])
   const issues: SeedIssue[] = []
 
   const categories = new Map<string, string>()
@@ -67,18 +67,18 @@ export async function planSeed(templateDir: string, manifest: Manifest, postsDir
   }
 
   const known = {
-    page: new Set(template.pages.map((page) => page.slug)),
-    form: new Set(template.forms.map((form) => form.key)),
+    page: new Set(site.pages.map((page) => page.slug)),
+    form: new Set(site.forms.map((form) => form.key)),
     category: new Set(categories.keys()),
     media: new Set<string>(),
   }
-  const templateMedia: string[] = []
+  const siteMedia: string[] = []
 
   // Records every token a value uses and reports the ones that name nothing.
   const checkingContext = (file: string, where: string): ResolveContext => {
     const lookup = (kind: TokenKind) => (key: string) => {
       if (kind === 'media') {
-        if (!templateMedia.includes(key)) templateMedia.push(key)
+        if (!siteMedia.includes(key)) siteMedia.push(key)
       } else if (!known[kind].has(key)) {
         issues.push({ file, where, path: '(reference)', message: `"@${kind}/${key}" names no ${kind} in the seed` })
       }
@@ -94,7 +94,7 @@ export async function planSeed(templateDir: string, manifest: Manifest, postsDir
   }
 
   const seen = new Set<string>()
-  template.pages.forEach((page, pageIndex) => {
+  site.pages.forEach((page, pageIndex) => {
     const where = `page "${page.slug ?? `#${pageIndex}`}"`
     if (!page.slug || !page.title) {
       issues.push({ file: 'pages.yaml', where, path: '(page)', message: 'every page needs a slug and a title' })
@@ -119,7 +119,7 @@ export async function planSeed(templateDir: string, manifest: Manifest, postsDir
           file: 'pages.yaml',
           where: sectionWhere,
           path: '(section)',
-          message: `"${name}" is not a section of ${manifest.name}; sections are ${Object.keys(manifest.sections).join(', ')}`,
+          message: `"${name}" is not a section; the sections are ${Object.keys(manifest.sections).join(', ')}`,
         })
         return
       }
@@ -131,7 +131,7 @@ export async function planSeed(templateDir: string, manifest: Manifest, postsDir
     })
   })
 
-  for (const [name, values] of Object.entries(template.globals)) {
+  for (const [name, values] of Object.entries(site.globals)) {
     const where = `global "${name}"`
     const meta = manifest.globalMeta[name as GlobalName]
     if (!meta) {
@@ -146,7 +146,7 @@ export async function planSeed(templateDir: string, manifest: Manifest, postsDir
   }
 
   const formKeys = new Set<string>()
-  template.forms.forEach((form, index) => {
+  site.forms.forEach((form, index) => {
     const where = `form "${form.key ?? `#${index}`}"`
     if (!form.key || !form.title) issues.push({ file: 'forms.yaml', where, path: '(form)', message: 'every form needs a key and a title' })
     if (formKeys.has(form.key)) issues.push({ file: 'forms.yaml', where, path: 'key', message: 'duplicate form key' })
@@ -169,7 +169,7 @@ export async function planSeed(templateDir: string, manifest: Manifest, postsDir
 
   // Every referenced file exists before anything is uploaded.
   await Promise.all([
-    ...templateMedia.map((file) => checkFile(template.mediaDir, file, 'pages.yaml or globals.yaml')),
+    ...siteMedia.map((file) => checkFile(site.mediaDir, file, 'pages.yaml or globals.yaml')),
     ...posts.posts
       .map((post) => safeParse(post.heroImage))
       .filter((token): token is { kind: TokenKind; key: string } => token?.kind === 'media')
@@ -179,9 +179,9 @@ export async function planSeed(templateDir: string, manifest: Manifest, postsDir
   if (issues.length > 0) throw new SeedValidationError(issues)
 
   return {
-    template,
+    site,
     posts,
-    templateMedia,
+    siteMedia,
     categories: [...categories].map(([slug, title]) => ({ slug, title })),
   }
 
@@ -210,11 +210,11 @@ function safeParse(value: unknown) {
   }
 }
 
-export async function seedTemplate({ payload, req, templateDir, manifest, postsDir, config }: SeedTemplateArgs): Promise<SeedSummary> {
-  const plan = await planSeed(templateDir, manifest, postsDir)
+export async function seedSite({ payload, req, templatesDir, manifest, postsDir, config }: SeedSiteArgs): Promise<SeedSummary> {
+  const plan = await planSeed(templatesDir, manifest, postsDir)
   const toLexical = createMarkdownConverter(config ?? payload.config)
 
-  payload.logger.info(`— Seeding ${manifest.label} (${manifest.name})...`)
+  payload.logger.info(`— Seeding ${manifest.siteName}...`)
 
   const categoryIds = new Map<string, DocumentId>()
   for (const { slug, title } of plan.categories) {
@@ -234,13 +234,13 @@ export async function seedTemplate({ payload, req, templateDir, manifest, postsD
     postCount++
   }
 
-  const templateMediaIds = new Map<string, DocumentId>()
-  for (const file of plan.templateMedia) {
-    templateMediaIds.set(file, await upload(plan.template.mediaDir, file, altFor(file, plan.template.alts)))
+  const siteMediaIds = new Map<string, DocumentId>()
+  for (const file of plan.siteMedia) {
+    siteMediaIds.set(file, await upload(plan.site.mediaDir, file, altFor(file, plan.site.alts)))
   }
 
   const formIds = new Map<string, DocumentId>()
-  for (const form of plan.template.forms) {
+  for (const form of plan.site.forms) {
     const data = {
       title: form.title,
       fields: form.fields,
@@ -271,7 +271,7 @@ export async function seedTemplate({ payload, req, templateDir, manifest, postsD
 
   // Pass 1: every page exists as a draft, so pass 2 can link to any of them.
   const pageIds = new Map<string, DocumentId>()
-  for (const page of plan.template.pages) {
+  for (const page of plan.site.pages) {
     const doc = await payload.create({
       collection: 'pages',
       data: { title: page.title, slug: page.slug },
@@ -284,7 +284,7 @@ export async function seedTemplate({ payload, req, templateDir, manifest, postsD
   }
 
   const context = (richText: ResolveContext['richText']): ResolveContext => ({
-    media: (file) => lookup(templateMediaIds, file, 'media'),
+    media: (file) => lookup(siteMediaIds, file, 'media'),
     page: (slug) => lookup(pageIds, slug, 'page'),
     form: (key) => lookup(formIds, key, 'form'),
     category: (slug) => lookup(categoryIds, slug, 'category'),
@@ -292,7 +292,7 @@ export async function seedTemplate({ payload, req, templateDir, manifest, postsD
   })
 
   // Pass 2: full layout, published.
-  for (const page of plan.template.pages) {
+  for (const page of plan.site.pages) {
     await payload.update({
       collection: 'pages',
       id: pageIds.get(page.slug)!,
@@ -305,7 +305,7 @@ export async function seedTemplate({ payload, req, templateDir, manifest, postsD
 
   const globals: GlobalName[] = []
   for (const name of ['header', 'footer'] as const) {
-    const values = plan.template.globals[name]
+    const values = plan.site.globals[name]
     if (!values) continue
     const data = resolveValues(
       values,
@@ -318,7 +318,7 @@ export async function seedTemplate({ payload, req, templateDir, manifest, postsD
 
   const summary: SeedSummary = {
     categories: categoryIds.size,
-    media: postMedia.size + templateMediaIds.size,
+    media: postMedia.size + siteMediaIds.size,
     posts: postCount,
     forms: formIds.size,
     pages: pageIds.size,

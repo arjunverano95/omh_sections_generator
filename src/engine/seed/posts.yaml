@@ -1,4 +1,4 @@
-# Demo posts seeded for every template. Posts are not sections; every face lists them.
+# Demo posts for the blog. Posts are not sections; the latest-posts section lists them.
 # heroImage resolves against src/engine/seed/media/; content is Markdown, converted with
 # the posts collection's own Lexical editor.
 

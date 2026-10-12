@@ -1,46 +1,29 @@
 /**
- * `compile()`: one template folder in, the generated files out (compiler.md). Every stage
- * collects diagnostics; nothing is written while there is an error.
+ * `compile()`: the files under templates/ in, the generated files out (compiler.md). Every
+ * stage collects diagnostics; nothing is written while there is an error.
  */
 
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 
 import type { Plan } from '../render/types'
-import {
-  GlobalFileSchema,
-  ManifestSchema,
-  SectionFileSchema,
-  ThemeSchema,
-  toJsonSchema,
-  type GlobalFile,
-  type ManifestFile,
-  type SectionFile,
-  type ThemeFile,
-} from '../schema'
+import { GlobalFileSchema, SectionFileSchema, ThemeSchema, toJsonSchema, type GlobalFile, type SectionFile, type ThemeFile } from '../schema'
+import { GLOBAL_NAMES } from '../schema/common'
 import { buildManifest, emitAll, GENERATED_FILE_NAMES, type GeneratedFiles } from './emit'
 import { Diagnostics, type Diagnostic } from './errors'
 import { loadYamlFile, toRepoPath, type LoadedFile } from './load'
-import {
-  normaliseGlobal,
-  normaliseSection,
-  normaliseTheme,
-  toScopeFields,
-  type NGlobal,
-  type NormalisedTemplate,
-  type NSection,
-} from './normalise'
+import { normaliseGlobal, normaliseSection, normaliseTheme, toScopeFields, type NGlobal, type NormalisedSite, type NSection } from './normalise'
 import { resolveLayout, warnUnreferenced, type ResolveContext, type Scope } from './resolve'
 import { validateFile } from './validate'
 
 export type CompileOptions = {
-  /** `templates/<name>`, absolute or relative to `repoRoot`. */
-  templateDir: string
+  /** The folder holding theme.yaml, globals/ and sections/, absolute or relative to `repoRoot`. Default `templates`. */
+  templatesDir?: string
   /** Diagnostics print paths relative to this. Default: the current directory. */
   repoRoot?: string
   /** Default `src/generated/sections`. */
   outDir?: string
-  /** Section previews are copied under `<publicDir>/sections/<template>/`. Default `public`. */
+  /** Section previews are copied under `<publicDir>/sections/`. Default `public`. */
   publicDir?: string
   /** Default `templates/schema.json`. */
   schemaPath?: string
@@ -54,28 +37,17 @@ export type CompileResult = {
   ok: boolean
   /** Errors first, then warnings. */
   diagnostics: Diagnostic[]
-  /** The generated modules, present once the template resolved without errors. */
+  /** The generated modules, present once the site resolved without errors. */
   files?: GeneratedFiles
   /** The JSON Schema for `templates/schema.json`. */
   schemaJson: string
   /** Repository-relative paths this run changed on disk. */
   written: string[]
-  template?: NormalisedTemplate
+  site?: NormalisedSite
 }
 
-export const DEFAULT_TEMPLATE = 'template-1'
 export const TEMPLATES_DIR = 'templates'
 export const OUT_DIR = path.join('src', 'generated', 'sections')
-
-/** Every `templates/<name>/` holding a `template.yaml`, in name order. */
-export function discoverTemplates(repoRoot: string): string[] {
-  const dir = path.join(repoRoot, TEMPLATES_DIR)
-  if (!existsSync(dir)) return []
-  return readdirSync(dir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && existsSync(path.join(dir, entry.name, 'template.yaml')))
-    .map((entry) => entry.name)
-    .sort(byCodeUnit)
-}
 
 /** Locale-independent order, so output is the same on every machine. */
 function byCodeUnit(a: string, b: string): number {
@@ -101,63 +73,25 @@ function writeIfChanged(absPath: string, content: string | Buffer): boolean {
 }
 
 type Loaded = {
-  manifest: ManifestFile
-  manifestFile: LoadedFile
   theme?: { data: ThemeFile; file: LoadedFile }
   header?: { data: GlobalFile; file: LoadedFile }
   footer?: { data: GlobalFile; file: LoadedFile }
   sections: { data: SectionFile; file: LoadedFile }[]
 }
 
-/** Discover, load and validate (rules 1 to 4 and 8, 10 to 12 of the format). */
-function loadTemplate(templateDir: string, repoRoot: string, diagnostics: Diagnostics): Loaded | undefined {
-  const manifestFile = loadYamlFile(path.join(templateDir, 'template.yaml'), repoRoot, diagnostics)
-  if (!manifestFile) return undefined
-  const manifest = validateFile(ManifestSchema, manifestFile, diagnostics)
-  if (!manifest) return undefined
+/**
+ * Load and validate the fixed layout: theme.yaml, globals/header.yaml, globals/footer.yaml
+ * and sections/*.yaml (rules 1 to 4 and 8, 10 to 12 of the format).
+ */
+function loadFiles(templatesDir: string, repoRoot: string, diagnostics: Diagnostics): Loaded {
+  const loaded: Loaded = { sections: [] }
 
-  const folder = path.basename(templateDir)
-  if (manifest.name !== folder) {
-    diagnostics.error({
-      file: manifestFile.file,
-      position: manifestFile.positionOf(['name']),
-      path: 'name',
-      message: `name is "${manifest.name}" but the folder is "${folder}"; the two must match`,
-    })
-  }
+  const themeFile = loadYamlFile(path.join(templatesDir, 'theme.yaml'), repoRoot, diagnostics)
+  const theme = themeFile && validateFile(ThemeSchema, themeFile, diagnostics)
+  if (themeFile && theme) loaded.theme = { data: theme, file: themeFile }
 
-  const resolveEntry = (key: string[], given: string, kind: 'file' | 'folder'): string | undefined => {
-    const abs = path.resolve(templateDir, given)
-    const exists = existsSync(abs) && (kind === 'folder' ? statSync(abs).isDirectory() : statSync(abs).isFile())
-    if (exists) return abs
-    diagnostics.error({
-      file: manifestFile.file,
-      position: manifestFile.positionOf(key),
-      path: key.join('.'),
-      message: `"${given}" is not a ${kind} (looked for ${toRepoPath(abs, repoRoot)})`,
-    })
-    return undefined
-  }
-
-  const themePath = resolveEntry(['theme'], manifest.theme, 'file')
-  const headerPath = resolveEntry(['globals', 'header'], manifest.globals.header, 'file')
-  const footerPath = resolveEntry(['globals', 'footer'], manifest.globals.footer, 'file')
-  const sectionsDir = resolveEntry(['sections'], manifest.sections, 'folder')
-
-  const loaded: Loaded = { manifest, manifestFile, sections: [] }
-
-  if (themePath) {
-    const file = loadYamlFile(themePath, repoRoot, diagnostics)
-    const data = file && validateFile(ThemeSchema, file, diagnostics)
-    if (file && data) loaded.theme = { data, file }
-  }
-
-  for (const [role, absPath] of [
-    ['header', headerPath],
-    ['footer', footerPath],
-  ] as const) {
-    if (!absPath) continue
-    const file = loadYamlFile(absPath, repoRoot, diagnostics)
+  for (const role of GLOBAL_NAMES) {
+    const file = loadYamlFile(path.join(templatesDir, 'globals', `${role}.yaml`), repoRoot, diagnostics)
     const data = file && validateFile(GlobalFileSchema, file, diagnostics)
     if (!file || !data) continue
     if (data.name !== role) {
@@ -165,38 +99,39 @@ function loadTemplate(templateDir: string, repoRoot: string, diagnostics: Diagno
         file: file.file,
         position: file.positionOf(['name']),
         path: 'name',
-        message: `template.yaml lists this file as the ${role} global, but its name is "${data.name}"`,
+        message: `globals/${role}.yaml is the ${role} global, but its name is "${data.name}"; the file is named by its role`,
       })
       continue
     }
     loaded[role] = { data, file }
   }
 
-  if (sectionsDir) {
-    const names = readdirSync(sectionsDir)
-      .filter((name) => /\.ya?ml$/i.test(name))
-      .sort(byCodeUnit)
-    if (names.length === 0) {
-      diagnostics.error({
-        file: manifestFile.file,
-        position: manifestFile.positionOf(['sections']),
-        path: 'sections',
-        message: `"${manifest.sections}" holds no .yaml files; a template needs at least one section`,
-      })
-    }
-    for (const name of names) {
-      const file = loadYamlFile(path.join(sectionsDir, name), repoRoot, diagnostics)
-      const data = file && validateFile(SectionFileSchema, file, diagnostics)
-      if (file && data) loaded.sections.push({ data, file })
-    }
+  const sectionsDir = path.join(templatesDir, 'sections')
+  const names =
+    existsSync(sectionsDir) && statSync(sectionsDir).isDirectory()
+      ? readdirSync(sectionsDir)
+          .filter((name) => /\.ya?ml$/i.test(name))
+          .sort(byCodeUnit)
+      : []
+  if (names.length === 0) {
+    diagnostics.error({
+      file: toRepoPath(sectionsDir, repoRoot),
+      path: '',
+      message: 'holds no .yaml files; at least one section is needed',
+    })
+  }
+  for (const name of names) {
+    const file = loadYamlFile(path.join(sectionsDir, name), repoRoot, diagnostics)
+    const data = file && validateFile(SectionFileSchema, file, diagnostics)
+    if (file && data) loaded.sections.push({ data, file })
   }
 
   return loaded
 }
 
-export function compile(options: CompileOptions): CompileResult {
+export function compile(options: CompileOptions = {}): CompileResult {
   const repoRoot = path.resolve(options.repoRoot ?? process.cwd())
-  const templateDir = path.resolve(repoRoot, options.templateDir)
+  const templatesDir = path.resolve(repoRoot, options.templatesDir ?? TEMPLATES_DIR)
   const outDir = path.resolve(repoRoot, options.outDir ?? OUT_DIR)
   const publicDir = path.resolve(repoRoot, options.publicDir ?? 'public')
   const schemaPath = path.resolve(repoRoot, options.schemaPath ?? path.join(TEMPLATES_DIR, 'schema.json'))
@@ -209,27 +144,25 @@ export function compile(options: CompileOptions): CompileResult {
     return { ok, diagnostics: diagnostics.sorted(), schemaJson, written, ...extra }
   }
 
-  // 1. discover, load, validate
-  const loaded = loadTemplate(templateDir, repoRoot, diagnostics)
-  if (!loaded || diagnostics.hasErrors || !loaded.theme || !loaded.header || !loaded.footer) return finish()
+  // 1. load, validate
+  const loaded = loadFiles(templatesDir, repoRoot, diagnostics)
+  if (diagnostics.hasErrors || !loaded.theme || !loaded.header || !loaded.footer) return finish()
 
   // 2. normalise
-  const templateName = loaded.manifest.name
-  const templateLabel = loaded.manifest.label
   const theme = normaliseTheme(loaded.theme.data, loaded.theme.file)
-  const header = normaliseGlobal(loaded.header.data, loaded.header.file, templateName, diagnostics)
-  const footer = normaliseGlobal(loaded.footer.data, loaded.footer.file, templateName, diagnostics)
+  const header = normaliseGlobal(loaded.header.data, loaded.header.file, diagnostics)
+  const footer = normaliseGlobal(loaded.footer.data, loaded.footer.file, diagnostics)
   const sections: NSection[] = []
   const seen = new Map<string, LoadedFile>()
   for (const { data, file } of loaded.sections) {
-    const section = normaliseSection(data, file, templateName, templateLabel, diagnostics)
+    const section = normaliseSection(data, file, diagnostics)
     const first = seen.get(section.name)
     if (first) {
       diagnostics.error({
         file: file.file,
         position: file.positionOf(['name']),
         path: 'name',
-        message: `section name "${section.name}" is already used by ${first.file}; names are unique within a template`,
+        message: `section name "${section.name}" is already used by ${first.file}; section names are unique`,
       })
       continue
     }
@@ -275,18 +208,9 @@ export function compile(options: CompileOptions): CompileResult {
   if (diagnostics.hasErrors) return finish()
 
   // 4. emit
-  const partial = {
-    name: templateName,
-    label: templateLabel,
-    description: loaded.manifest.description,
-    dir: templateDir,
-    theme,
-    globals: { header, footer },
-    sections,
-    plans,
-  }
-  const template: NormalisedTemplate = { ...partial, manifest: buildManifest(partial) }
-  const files = emitAll(template)
+  const partial = { dir: templatesDir, theme, globals: { header, footer }, sections, plans }
+  const site: NormalisedSite = { ...partial, manifest: buildManifest(partial) }
+  const files = emitAll(site)
 
   // 5. schema.json: written with the output, or checked for drift
   if (options.check) {
@@ -303,7 +227,7 @@ export function compile(options: CompileOptions): CompileResult {
     }
   }
 
-  const result = finish({ files, template })
+  const result = finish({ files, site })
   if (options.check || !result.ok) return result
 
   // 6. write what changed

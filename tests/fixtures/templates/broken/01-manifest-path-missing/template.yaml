@@ -1,8 +1,0 @@
-# yaml-language-server: $schema=../../../../../templates/schema.json
-name: 01-manifest-path-missing
-label: Minimal
-theme: ./missing-theme.yaml
-globals:
-  header: ./globals/header.yaml
-  footer: ./globals/footer.yaml
-sections: ./sections

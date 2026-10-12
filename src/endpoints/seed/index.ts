@@ -2,10 +2,10 @@ import type { CollectionSlug, Payload, PayloadRequest, SanitizedConfig } from 'p
 import { revalidatePath, revalidateTag } from 'next/cache'
 import path from 'node:path'
 
-import { seedTemplate } from '@/engine/seed'
+import { seedSite } from '@/engine/seed'
 import { manifest } from '@/generated/sections/manifest'
 
-/** Cleared before every seed, so reseeding (or seeding another template) starts from nothing. */
+/** Cleared before every seed, so reseeding starts from nothing. */
 const collections: CollectionSlug[] = [
   'categories',
   'media',
@@ -17,8 +17,8 @@ const collections: CollectionSlug[] = [
 ]
 
 /**
- * Clears the content collections, then seeds the active template: its pages, forms, media
- * and globals from `templates/<name>/seed/`, plus the engine's demo posts.
+ * Clears the content collections, then seeds the site: its pages, forms, media and globals
+ * from `templates/seed/`, plus the engine's demo posts.
  *
  * Next.js revalidation errors are normal when seeding without a server running; the seeder
  * writes with `disableRevalidate` and the stock hooks skip revalidation in that case.
@@ -35,7 +35,7 @@ export const seed = async ({
   req: PayloadRequest
   config?: SanitizedConfig
 }): Promise<void> => {
-  payload.logger.info(`Seeding database with ${manifest.label} (${manifest.name})...`)
+  payload.logger.info(`Seeding database with ${manifest.siteName}...`)
 
   payload.logger.info(`— Clearing collections...`)
 
@@ -49,11 +49,11 @@ export const seed = async ({
       .map((collection) => payload.db.deleteVersions({ collection, req, where: {} })),
   )
 
-  const summary = await seedTemplate({
+  const summary = await seedSite({
     payload,
     req,
     config,
-    templateDir: path.resolve(process.cwd(), 'templates', manifest.name),
+    templatesDir: path.resolve(process.cwd(), 'templates'),
     manifest,
   })
 

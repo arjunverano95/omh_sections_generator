@@ -1,0 +1,6 @@
+# yaml-language-server: $schema=../schema.json
+# Alt text for each file in seed/media, keyed by file name. A file not listed here gets
+# an alt derived from its name.
+logo.svg: Studio
+hero.jpg: Blue and sand gradient with the word Studio
+avatar.jpg: Portrait placeholder with the initials ML

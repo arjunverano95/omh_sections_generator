@@ -1,0 +1,3 @@
+file: globals/header.yaml
+path: "name"
+message: "is the header global, but its name is \"footer\""

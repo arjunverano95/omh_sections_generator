@@ -1,6 +1,6 @@
 /**
  * The render plan: what the compiler emits for every block and global, and what the
- * renderer interprets. Nothing here knows about any particular section or template.
+ * renderer interprets. Nothing here knows about any particular section or site.
  *
  * Contract between src/engine/compiler (producer) and src/engine/render (consumer).
  * Everything the renderer would otherwise have to check — variant names, tag names,
@@ -127,7 +127,7 @@ export type PlanNodeType = (typeof PLAN_NODE_TYPES)[number]
 
 /** One block's or global's layout, fully resolved. */
 export type Plan = PlanNode[]
-/** Keyed by block slug (`template-1-hero-split`) or global slug (`header`, `footer`). */
+/** Keyed by block slug (`hero-split`) or global slug (`header`, `footer`). */
 export type Plans = Record<string, Plan>
 
 /** Data the renderer resolves references against. Innermost scope first: `[row, section]`. */

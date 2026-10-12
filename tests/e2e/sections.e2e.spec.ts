@@ -10,8 +10,7 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 const serverURL = 'http://localhost:3000'
-const template = process.env.SITE_TEMPLATE || 'template-1'
-const seedDir = path.resolve(dirname, '../../templates', template, 'seed')
+const seedDir = path.resolve(dirname, '../../templates/seed')
 
 type SeedSection = Record<string, Record<string, unknown>>
 type SeedPage = { slug: string; title: string; sections: SeedSection[] }
@@ -50,11 +49,11 @@ const pages = readSeed<SeedPage[]>('pages.yaml')
 const forms = readSeed<SeedForm[]>('forms.yaml')
 
 const home = pages.find((p) => p.slug === 'home')
-if (!home) throw new Error(`${template}: seed/pages.yaml has no page with slug "home"`)
+if (!home) throw new Error('templates/seed/pages.yaml has no page with slug "home"')
 
 const heroHeading = sectionData(home).find((data) => typeof data.heading === 'string')?.heading
 if (typeof heroHeading !== 'string') {
-  throw new Error(`${template}: no section on the home page has a heading`)
+  throw new Error('no section on the home page has a heading')
 }
 
 const formKey = sectionData(home)
@@ -62,9 +61,9 @@ const formKey = sectionData(home)
   .find((value): value is string => typeof value === 'string' && value.startsWith('@form/'))
   ?.slice('@form/'.length)
 const form = forms.find((f) => f.key === formKey)
-if (!form) throw new Error(`${template}: no form on the home page found in seed/forms.yaml`)
+if (!form) throw new Error('no form on the home page found in templates/seed/forms.yaml')
 
-test.describe(`Sections: ${template}`, () => {
+test.describe('Sections', () => {
   let page: Page
 
   test.beforeAll(async ({ browser }) => {

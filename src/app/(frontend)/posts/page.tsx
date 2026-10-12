@@ -59,6 +59,6 @@ export default async function Page() {
 
 export function generateMetadata(): Metadata {
   return {
-    title: `Posts | ${manifest.label}`,
+    title: `Posts | ${manifest.siteName}`,
   }
 }

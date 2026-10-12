@@ -1,5 +1,5 @@
 /**
- * The compiler against its fixtures and the shipped templates (compiler.md section 10).
+ * The compiler against its fixtures and the files under templates/ (compiler.md section 10).
  * No database: everything here is files in, files out.
  */
 
@@ -10,7 +10,7 @@ import path from 'node:path'
 import { parse } from 'yaml'
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { compile, discoverTemplates, schemaJsonText } from '@/engine/compiler'
+import { compile, schemaJsonText } from '@/engine/compiler'
 import { parseArgs } from '@/engine/compiler/cli'
 import { GENERATED_FILE_NAMES } from '@/engine/compiler/emit'
 import type { ListNode } from '@/engine/render/types'
@@ -43,7 +43,7 @@ describe('broken fixtures: one error each, where expect.yaml says', () => {
     it(name, () => {
       const dir = path.join(brokenRoot, name)
       const expected = parse(readFileSync(path.join(dir, 'expect.yaml'), 'utf8')) as Expectation
-      const result = compile({ templateDir: dir, repoRoot: dir, check: true, schemaPath })
+      const result = compile({ templatesDir: dir, repoRoot: dir, check: true, schemaPath })
       expect(result.ok).toBe(false)
 
       const errors = result.diagnostics.filter((d) => d.severity === 'error')
@@ -59,13 +59,28 @@ describe('broken fixtures: one error each, where expect.yaml says', () => {
   }
 })
 
+describe('missing files', () => {
+  it('names each required file that is missing, with no position to point at', () => {
+    const dir = tempDir('empty')
+    const result = compile({ templatesDir: dir, repoRoot: dir, check: true, schemaPath })
+    expect(result.ok).toBe(false)
+    expect(result.diagnostics.map((d) => `${d.file}: ${d.message}`)).toEqual([
+      'globals/footer.yaml: file not found',
+      'globals/header.yaml: file not found',
+      'sections: holds no .yaml files; at least one section is needed',
+      'theme.yaml: file not found',
+    ])
+    expect(result.diagnostics.every((d) => d.position === undefined)).toBe(true)
+  })
+})
+
 describe('valid-minimal', () => {
   const dir = path.join(fixturesRoot, 'valid-minimal')
 
   it('compiles without diagnostics and writes the six files plus schema.json', () => {
     const out = tempDir('minimal')
     const result = compile({
-      templateDir: dir,
+      templatesDir: dir,
       repoRoot: dir,
       outDir: path.join(out, 'generated'),
       publicDir: path.join(out, 'public'),
@@ -84,7 +99,7 @@ describe('valid-minimal', () => {
 
   it('is deterministic and writes nothing the second time', () => {
     const out = tempDir('twice')
-    const options = { templateDir: dir, repoRoot: dir, outDir: out, publicDir: out, schemaPath: path.join(out, 's.json') }
+    const options = { templatesDir: dir, repoRoot: dir, outDir: out, publicDir: out, schemaPath: path.join(out, 's.json') }
     const first = compile(options)
     const second = compile(options)
     expect(second.files).toEqual(first.files)
@@ -93,42 +108,41 @@ describe('valid-minimal', () => {
 
   it('in check mode writes nothing and reports schema.json drift', () => {
     const out = tempDir('check')
-    const result = compile({ templateDir: dir, repoRoot: dir, outDir: out, check: true, schemaPath: path.join(out, 'missing.json') })
+    const result = compile({ templatesDir: dir, repoRoot: dir, outDir: out, check: true, schemaPath: path.join(out, 'missing.json') })
     expect(readdirSync(out)).toEqual([])
     expect(result.ok).toBe(false)
     expect(result.diagnostics.map((d) => d.message)).toEqual([expect.stringContaining('missing')])
   })
 })
 
-describe('shipped templates', () => {
-  const names = discoverTemplates(repoRoot)
+describe('templates/', () => {
+  const result = compile({ repoRoot, check: true, strict: true })
 
-  it('ships template-1 and template-2', () => {
-    expect(names).toEqual(['template-1', 'template-2'])
+  it('passes sections:check (no errors, no warnings, schema.json current)', () => {
+    expect(result.diagnostics).toEqual([])
+    expect(result.ok).toBe(true)
   })
 
-  for (const name of names) {
-    describe(name, () => {
-      const result = compile({ templateDir: path.join('templates', name), repoRoot, check: true, strict: true })
+  it('compiles one block per file under templates/sections, named by the section, in name order', () => {
+    const names = readdirSync(path.join(repoRoot, 'templates', 'sections'))
+      .filter((file) => /\.ya?ml$/i.test(file))
+      .map((file) => file.replace(/\.ya?ml$/i, ''))
+      .sort()
+    expect(result.site!.manifest.blocks).toEqual(names)
+    expect(result.site!.manifest.siteName).toBe('Studio')
+  })
 
-      it('passes sections:check (no errors, no warnings, schema.json current)', () => {
-        expect(result.diagnostics).toEqual([])
-        expect(result.ok).toBe(true)
-      })
-
-      for (const file of GENERATED_FILE_NAMES) {
-        it(`emits ${file} as reviewed`, async () => {
-          await expect(result.files![file]).toMatchFileSnapshot(path.join('__snapshots__', 'compiler', name, `${file}.snap`))
-        })
-      }
+  for (const file of GENERATED_FILE_NAMES) {
+    it(`emits ${file} as reviewed`, async () => {
+      await expect(result.files![file]).toMatchFileSnapshot(path.join('__snapshots__', 'compiler', `${file}.snap`))
     })
   }
 })
 
 describe('list select derivation', () => {
   it('selects exactly what the children reference, plus slug for url', () => {
-    const dir = path.join(tempDir('select'), 'select-demo')
-    writeTemplate(dir, {
+    const dir = tempDir('select')
+    writeTemplates(dir, {
       'sections/posts.yaml': `
 name: posts
 label: Posts
@@ -162,11 +176,11 @@ layout:
               - button: { label: Read, href: url }
 `,
     })
-    const result = compile({ templateDir: dir, repoRoot: dir, check: true, schemaPath })
+    const result = compile({ templatesDir: dir, repoRoot: dir, check: true, schemaPath })
     // valid-minimal's theme declares a variant this section does not use: a warning, not an error.
     expect(result.diagnostics.filter((d) => d.severity === 'error')).toEqual([])
 
-    const section = result.template!.plans['select-demo-posts']![0]!
+    const section = result.site!.plans['posts']![0]!
     expect(section.type).toBe('div')
     const list = (section as { children: unknown[] }).children[1] as ListNode
     expect(list.type).toBe('list')
@@ -188,28 +202,20 @@ describe('templates/schema.json', () => {
 
 describe('cli arguments', () => {
   it('parses the documented flags', () => {
-    expect(parseArgs(['--template', 'template-2', '--check', '--strict'])).toMatchObject({
-      template: 'template-2',
-      check: true,
-      strict: true,
-      watch: false,
-      all: false,
-    })
-    expect(parseArgs(['--template=template-2'])).toMatchObject({ template: 'template-2' })
+    expect(parseArgs(['--check', '--strict'])).toEqual({ check: true, strict: true, watch: false, help: false })
+    expect(parseArgs(['--watch'])).toEqual({ check: false, strict: false, watch: true, help: false })
+    expect(parseArgs([])).toEqual({ check: false, strict: false, watch: false, help: false })
   })
 
-  it('refuses --all without --check', () => {
-    expect(() => parseArgs(['--all'])).toThrow(/--check/)
+  it('refuses an unknown option', () => {
     expect(() => parseArgs(['--bogus'])).toThrow(/unknown option/)
   })
 })
 
-/** A complete template around the given files; whatever is not given comes from valid-minimal. */
-function writeTemplate(dir: string, files: Record<string, string>): void {
+/** A complete templates folder around the given files; whatever is not given comes from valid-minimal. */
+function writeTemplates(dir: string, files: Record<string, string>): void {
   const minimal = path.join(fixturesRoot, 'valid-minimal')
-  const name = path.basename(dir)
   const defaults: Record<string, string> = {
-    'template.yaml': readFileSync(path.join(minimal, 'template.yaml'), 'utf8').replace(/^name: .*$/m, `name: ${name}`),
     'theme.yaml': readFileSync(path.join(minimal, 'theme.yaml'), 'utf8'),
     'globals/header.yaml': readFileSync(path.join(minimal, 'globals', 'header.yaml'), 'utf8'),
     'globals/footer.yaml': readFileSync(path.join(minimal, 'globals', 'footer.yaml'), 'utf8'),

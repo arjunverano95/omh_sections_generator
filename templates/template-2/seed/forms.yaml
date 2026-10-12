@@ -1,8 +1,0 @@
-# yaml-language-server: $schema=../../schema.json
-- key: newsletter
-  title: Newsletter
-  submitButtonLabel: Subscribe
-  confirmationType: message
-  confirmationMessage: You are on the list. Watch your inbox for the launch notes.
-  fields:
-    - { blockType: email, name: email, label: Email, required: true }

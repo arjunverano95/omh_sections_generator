@@ -12,14 +12,14 @@ vi.mock('@/engine/seed/lexical', () => ({
   createMarkdownConverter: () => (markdown: string, target: unknown) => ({ lexical: markdown, target }),
 }))
 
-const { getHomeFallback, planSeed, seedTemplate, SeedValidationError } = await import('@/engine/seed')
+const { getHomeFallback, planSeed, seedSite, SeedValidationError } = await import('@/engine/seed')
 const { parseToken, slugify } = await import('@/engine/seed/tokens')
 const { validateValues } = await import('@/engine/seed/validate')
 const { resolveValues } = await import('@/engine/seed/resolve')
 
-const TEMPLATE_DIR = path.resolve('templates/template-1')
+const TEMPLATES_DIR = path.resolve('templates')
 
-// --- the manifest the compiler would emit for template-1, written out by hand ---
+// --- the manifest the compiler would emit for templates/, written out by hand ---
 
 const f = (name: string, type: FieldMeta['type'], extra: Partial<FieldMeta> = {}): FieldMeta => ({
   name,
@@ -31,16 +31,15 @@ const f = (name: string, type: FieldMeta['type'], extra: Partial<FieldMeta> = {}
 
 const section = (name: string, fields: FieldMeta[]): SectionMeta => ({
   name,
-  slug: `template-1-${name}`,
-  interfaceName: `Template1${name.replace(/(^|-)(\w)/g, (_, __, c: string) => c.toUpperCase())}Block`,
+  slug: name,
+  interfaceName: `${name.replace(/(^|-)(\w)/g, (_, __, c: string) => c.toUpperCase())}Block`,
   label: name,
   fields,
 })
 
 const manifest: Manifest = {
-  name: 'template-1',
-  label: 'Studio',
-  blocks: ['hero-split', 'features', 'latest-posts', 'testimonial', 'contact'].map((n) => `template-1-${n}`),
+  siteName: 'Studio',
+  blocks: ['hero-split', 'features', 'latest-posts', 'testimonial', 'contact'],
   globals: ['header', 'footer'],
   sections: {
     'hero-split': section('hero-split', [
@@ -78,13 +77,13 @@ const manifest: Manifest = {
     header: {
       name: 'header',
       slug: 'header',
-      interfaceName: 'Template1Header',
+      interfaceName: 'Header',
       fields: [f('logo', 'image', { required: true }), f('navItems', 'array', { max: 6, fields: [f('link', 'link')] }), f('cta', 'link')],
     },
     footer: {
       name: 'footer',
       slug: 'footer',
-      interfaceName: 'Template1Footer',
+      interfaceName: 'Footer',
       fields: [
         f('columns', 'array', {
           max: 4,
@@ -238,10 +237,10 @@ describe('resolveValues', () => {
 })
 
 describe('planSeed', () => {
-  it('accepts the template-1 seed and lists what it needs', async () => {
-    const plan = await planSeed(TEMPLATE_DIR, manifest)
-    expect(plan.template.pages.map((page) => page.slug)).toEqual(['home', 'contact'])
-    expect(plan.templateMedia.sort()).toEqual(['avatar.jpg', 'hero.jpg', 'logo.svg'])
+  it('accepts the seed under templates/ and lists what it needs', async () => {
+    const plan = await planSeed(TEMPLATES_DIR, manifest)
+    expect(plan.site.pages.map((page) => page.slug)).toEqual(['home', 'contact'])
+    expect(plan.siteMedia.sort()).toEqual(['avatar.jpg', 'hero.jpg', 'logo.svg'])
     expect(plan.categories.map((category) => category.slug)).toEqual(['technology', 'news', 'finance'])
   })
 
@@ -275,7 +274,7 @@ describe('planSeed', () => {
         expect.objectContaining({ where: 'page "home", section "hero-split" (sections[0])', path: 'headin' }),
         expect.objectContaining({ where: 'page "home", section "hero-split" (sections[0])', path: 'heading', message: 'is required' }),
         expect.objectContaining({ where: 'page "home", section "contact" (sections[1])', message: '"@form/nope" names no form in the seed' }),
-        expect.objectContaining({ where: 'page "home", section "pricing" (sections[2])', message: expect.stringMatching(/not a section of template-1/) }),
+        expect.objectContaining({ where: 'page "home", section "pricing" (sections[2])', message: expect.stringMatching(/not a section; the sections are hero-split/) }),
       ])
       expect((error as Error).message).toContain('pages.yaml: page "home", section "hero-split" (sections[0]), field "heading": is required')
     })
@@ -290,10 +289,10 @@ describe('planSeed', () => {
   })
 })
 
-describe('seedTemplate', () => {
+describe('seedSite', () => {
   it('writes categories, media, posts, forms, pages in two passes, then globals', async () => {
     const { payload, calls } = mockPayload()
-    const summary = await seedTemplate({ payload, req, templateDir: TEMPLATE_DIR, manifest })
+    const summary = await seedSite({ payload, req, templatesDir: TEMPLATES_DIR, manifest })
 
     const order = calls.map((call) => `${call.op}:${call.collection ?? call.slug}`)
     const firstIndex = (entry: string) => order.indexOf(entry)
@@ -324,13 +323,7 @@ describe('seedTemplate', () => {
       meta: Record<string, unknown>
     }
     expect(home._status).toBe('published')
-    expect(home.layout.map((row) => row.blockType)).toEqual([
-      'template-1-hero-split',
-      'template-1-features',
-      'template-1-latest-posts',
-      'template-1-testimonial',
-      'template-1-contact',
-    ])
+    expect(home.layout.map((row) => row.blockType)).toEqual(['hero-split', 'features', 'latest-posts', 'testimonial', 'contact'])
     expect(home.layout[0]!.primaryButton).toEqual({
       type: 'reference',
       label: 'Start a project',
@@ -340,7 +333,7 @@ describe('seedTemplate', () => {
     expect(home.layout[2]!.category).toMatch(/^categories-/)
     expect(home.layout[3]!.quote).toEqual({
       lexical: expect.stringContaining('**love**'),
-      target: { block: 'template-1-testimonial', fieldPath: ['quote'] },
+      target: { block: 'testimonial', fieldPath: ['quote'] },
     })
     expect(home.layout[4]!.form).toMatch(/^forms-/)
     expect(home.meta.image).toBe(home.layout[0]!.image)
@@ -391,7 +384,7 @@ describe('seedTemplate', () => {
         ].join('\n'),
       )
       const { payload, calls } = mockPayload()
-      await seedTemplate({ payload, req, templateDir: dir, manifest })
+      await seedSite({ payload, req, templatesDir: dir, manifest })
 
       const form = calls.find((call) => call.collection === 'forms')!.args.data as Record<string, unknown>
       expect(form.confirmationType).toBe('redirect')
@@ -411,14 +404,14 @@ describe('seedTemplate', () => {
   it('writes nothing when the seed is invalid', async () => {
     const { payload, calls } = mockPayload()
     const broken: Manifest = { ...manifest, sections: { ...manifest.sections, contact: section('contact', [f('heading', 'text')]) } }
-    await expect(seedTemplate({ payload, req, templateDir: TEMPLATE_DIR, manifest: broken })).rejects.toThrow(SeedValidationError)
+    await expect(seedSite({ payload, req, templatesDir: TEMPLATES_DIR, manifest: broken })).rejects.toThrow(SeedValidationError)
     expect(calls).toEqual([])
   })
 })
 
 describe('getHomeFallback', () => {
   it('returns the home layout as rows that need no documents', async () => {
-    const rows = await getHomeFallback(TEMPLATE_DIR, manifest)
+    const rows = await getHomeFallback(TEMPLATES_DIR, manifest)
     expect(rows.map((row) => row.blockType)).toEqual(manifest.blocks)
     const [hero, , posts, testimonial, contact] = rows
     expect(hero).not.toHaveProperty('image')

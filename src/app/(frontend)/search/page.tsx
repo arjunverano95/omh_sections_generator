@@ -85,6 +85,6 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
 
 export function generateMetadata(): Metadata {
   return {
-    title: `Search | ${manifest.label}`,
+    title: `Search | ${manifest.siteName}`,
   }
 }

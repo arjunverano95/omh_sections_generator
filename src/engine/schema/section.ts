@@ -28,7 +28,7 @@ const shared = {
   layout: LayoutSchema,
 }
 
-/** `templates/<name>/sections/<section>.yaml` */
+/** `templates/sections/<section>.yaml` */
 export const SectionFileSchema = z
   .strictObject({
     kind: z.literal('section').optional(),
@@ -45,7 +45,7 @@ export const SectionFileSchema = z
 
 export type SectionFile = z.infer<typeof SectionFileSchema>
 
-/** `templates/<name>/globals/{header,footer}.yaml` */
+/** `templates/globals/{header,footer}.yaml` */
 export const GlobalFileSchema = z
   .strictObject({
     kind: z.literal('global', { error: 'a global file starts with kind: global' }),

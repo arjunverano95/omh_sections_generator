@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=./schema.json
+siteName: Studio
+
+fonts:
+  sans: Inter
+  heading: Playfair Display
+
+colors:
+  light:
+    background: oklch(98.5% 0.008 85deg)
+    foreground: oklch(19% 0.012 60deg)
+    card: oklch(99.5% 0.004 85deg)
+    card-foreground: oklch(19% 0.012 60deg)
+    primary: oklch(40% 0.13 260deg)
+    primary-foreground: oklch(98% 0.005 85deg)
+    secondary: oklch(94% 0.012 85deg)
+    secondary-foreground: oklch(24% 0.012 60deg)
+    muted: oklch(95% 0.01 85deg)
+    muted-foreground: oklch(46% 0.012 60deg)
+    accent: oklch(93% 0.02 255deg)
+    accent-foreground: oklch(30% 0.1 260deg)
+    border: oklch(89% 0.012 85deg)
+    input: oklch(89% 0.012 85deg)
+    ring: oklch(40% 0.13 260deg)
+  dark:
+    background: oklch(17% 0.01 60deg)
+    foreground: oklch(95% 0.008 85deg)
+    card: oklch(20% 0.01 60deg)
+    card-foreground: oklch(95% 0.008 85deg)
+    primary: oklch(72% 0.11 255deg)
+    primary-foreground: oklch(17% 0.02 260deg)
+    secondary: oklch(25% 0.01 60deg)
+    secondary-foreground: oklch(93% 0.008 85deg)
+    muted: oklch(24% 0.01 60deg)
+    muted-foreground: oklch(70% 0.01 85deg)
+    accent: oklch(28% 0.04 255deg)
+    accent-foreground: oklch(92% 0.02 255deg)
+    border: oklch(30% 0.01 60deg)
+    input: oklch(30% 0.01 60deg)
+    ring: oklch(72% 0.11 255deg)
+
+radius: 0.5rem
+
+variants:
+  heading:
+    display: font-heading text-5xl leading-[1.05] tracking-tight md:text-6xl
+    section: font-heading text-3xl tracking-tight md:text-4xl
+  text:
+    lead: text-lg leading-relaxed text-muted-foreground
+    eyebrow: text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground
+  button:
+    primary: inline-flex items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90
+    ghost: inline-flex items-center justify-center rounded-md border border-border px-5 py-3 text-sm font-medium transition-colors hover:bg-muted
+    link: text-sm text-foreground/75 transition-colors hover:text-foreground
