@@ -16,12 +16,24 @@ type LinkProps = Pick<
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
+/** The home page is served at `/`; CMSLink would build `/home` from its slug. */
+function isHomePage(reference: LinkProps['reference']): boolean {
+  return (
+    reference?.relationTo === 'pages' &&
+    typeof reference.value === 'object' &&
+    reference.value.slug === 'home'
+  )
+}
+
 /** A `link` field's group, narrowed to what CMSLink reads. */
 function fromGroup(group: Record<string, unknown>): LinkProps {
+  const type = group.type as LinkProps['type']
+  const reference = (group.reference as LinkProps['reference']) ?? null
+  const home = type === 'reference' && isHomePage(reference)
   return {
-    type: group.type as LinkProps['type'],
-    url: typeof group.url === 'string' ? group.url : null,
-    reference: (group.reference as LinkProps['reference']) ?? null,
+    type: home ? 'custom' : type,
+    url: home ? '/' : typeof group.url === 'string' ? group.url : null,
+    reference: home ? null : reference,
     label: typeof group.label === 'string' ? group.label : null,
     newTab: group.newTab === true,
   }

@@ -188,6 +188,7 @@ describe('primitives', () => {
       [
         { type: 'button', source: { path: ['a'] } },
         { type: 'button', source: { path: ['b'] } },
+        { type: 'button', source: { path: ['c'] } },
       ],
       [
         {
@@ -201,12 +202,19 @@ describe('primitives', () => {
             label: 'Post',
             reference: { relationTo: 'posts', value: { slug: 'hello' } },
           },
+          // The home page is served at the root, not at /home.
+          c: {
+            type: 'reference',
+            label: 'Home',
+            reference: { relationTo: 'pages', value: { slug: 'home' } },
+          },
         },
       ],
     )
     expect([...el.querySelectorAll('a')].map((a) => a.getAttribute('href'))).toEqual([
       '/about',
       '/posts/hello',
+      '/',
     ])
   })
 
