@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../../../templates/schema.json
+kind: global
+name: footer
+fields:
+  note: text
+layout:
+  - div: container py-4
+    as: footer
+    children:
+      - text: note
+        as: small
