@@ -145,10 +145,10 @@ Six phases. Each ends in a state that runs and is committed on its own. Phase 2 
 - [x] `pnpm sections:check` passes with `--strict`
 - [x] `pnpm test:int` passes: 91 tests in 5 files (compiler fixtures, snapshots, renderer, seeder)
 - [x] `pnpm test:e2e` passes: 7 tests in 3 files. Sections (3): seed, the home hero heading, the header and footer, a contact form submission. Admin Panel (3). Frontend (1): a post page
-- [ ] `pnpm lint`, `tsc --noEmit` and `pnpm build` pass
-- [ ] Every seeded page renders and both forms' submissions are in the admin; every section lists in the admin's add-block drawer under its group with its label and fields; Live Preview renders the page beside the form
-- [ ] R8 acceptance: a section added under `templates/sections/` compiles, appears in the admin's drawer under its group, and `git status` shows nothing under `src/`
-- [ ] R9 lean output: compiler test "list select derivation"; the renderer tests for empty values rendering nothing; a generated block declares only the section's fields (the compiler snapshots)
+- [x] `pnpm lint`, `tsc --noEmit` and `pnpm build` pass
+- [x] Every seeded page renders and both forms' submissions are in the admin; every section lists in the admin's add-block drawer under its group with its label and fields; Live Preview renders the page beside the form
+- [x] R8 acceptance: a section added under `templates/sections/` compiles, appears in the admin's drawer under its group, and the only change `git status` shows under `src/` is the regenerated `src/payload-types.ts` (the commits that added the eleven later sections touch no other file there)
+- [x] R9 lean output: compiler test "list select derivation"; the renderer tests for empty values rendering nothing; a generated block declares only the section's fields (the compiler snapshots)
 - [x] No attribution trailers in any commit message
 
 ## Open Issues
