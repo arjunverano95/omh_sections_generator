@@ -1,23 +1,23 @@
 # Compiler
 
-Part of the [Sections Engine Specification](README.md). The compiler reads one template folder ([template-format.md](template-format.md)) and emits everything Payload and the renderer need. It is a build-time script with no runtime footprint.
+Part of the [Sections Engine Specification](README.md). The compiler reads the templates folder ([template-format.md](template-format.md)) and emits everything Payload and the renderer need. It is a build-time script with no runtime footprint.
 
 ## 1. Contract
 
-- **Input:** `templates/<SITE_TEMPLATE>/`. `SITE_TEMPLATE` defaults to `template-1`.
-- **Output:** `src/generated/sections/` (section 4). The path is stable so every import site is hand-written once; switching templates rewrites the folder.
-- **Exit code:** 0 on success, 1 on any error. `pnpm dev` and `pnpm build` do not start on a failed compile.
-- **Determinism:** the same input produces byte-identical output. Files are emitted in a fixed order with sorted keys.
+- **Input:** `templates/`: `theme.yaml`, `globals/header.yaml`, `globals/footer.yaml` and `sections/*.yaml`.
+- **Output:** `src/generated/sections/` (section 4). The path is stable, so every import of generated code is hand-written once.
+- **Exit code:** 0 on success, 1 on any template error, 2 on a bug in the compiler. `pnpm dev` and `pnpm build` do not start on a failed compile.
+- **Determinism:** the same input produces byte-identical output. Files are emitted in a fixed order with sorted keys, and a compile that would write identical bytes writes nothing.
 - **No network, no database.** Fonts are referenced by name; the Next.js build fetches them.
 
 ## 2. Pipeline
 
 ```
-discover   templates/<t>/template.yaml -> theme, globals, sections/*.yaml
-load       parse YAML, keep source positions for every node
+load       templates/theme.yaml, globals/header.yaml, globals/footer.yaml, sections/*.yaml
+           parse YAML, keep source positions for every node
 validate   zod schemas; structural errors stop here
+normalise  short forms to long forms; defaults filled; one internal model (NormalisedSite)
 resolve    references, variants, icon names, list selects; semantic errors stop here
-normalise  short forms to long forms; defaults filled; one internal model
 emit       blocks.ts, globals.ts, plan.ts, theme.css, fonts.ts, manifest.ts
 ```
 
@@ -25,52 +25,79 @@ Source layout:
 
 ```
 src/engine/
-  schema/        zod schemas: manifest, theme, section, global, seed; toJsonSchema()
+  schema/          zod schemas: theme, section, global, fields, layout, seed; toJsonSchema()
+  manifest.ts      the Manifest type the compiler emits and the seeder reads
+  icons.ts         the curated icon list
   compiler/
-    index.ts     compile(templateDir, outDir, options): CompileResult
-    load.ts      YAML with positions
-    validate.ts  schema pass
-    resolve.ts   scopes, references, variants, list selects
-    normalise.ts internal model (NormalisedTemplate)
-    emit/        one file per output
-    errors.ts    CompileError with file, position, path, message, hint
-    cli.ts       argument parsing, watch mode, printing
+    index.ts       compile(options): CompileResult
+    load.ts        loadFiles: YAML with positions, required-file checks
+    validate.ts    schema pass
+    normalise.ts   normaliseSection(doc, file, diagnostics), normaliseGlobal(doc, file, diagnostics)
+    resolve.ts     scopes, references, variants, list selects
+    collections.ts the fields a list row may reference, per collection
+    emit/          one emitter per output, plus the printer
+    errors.ts      diagnostics with file, position, path, message, hint
+    cli.ts         argument parsing, watch mode, printing
 ```
+
+`compile({ templatesDir?, repoRoot?, outDir?, publicDir?, schemaPath?, check?, strict? })` defaults `templatesDir` to `templates`, `outDir` to `src/generated/sections`, `publicDir` to `public` and `schemaPath` to `templates/schema.json`. Its result carries `ok`, the diagnostics (errors first, then warnings), the generated files and `site`, the normalised site: folder, theme, globals, sections, plans and manifest. A section without a `group` gets `DEFAULT_GROUP`, which is `Sections`.
 
 ## 3. Command line
 
 ```
-pnpm sections:compile                       # SITE_TEMPLATE or template-1
-pnpm sections:compile --template template-2
-pnpm sections:compile --watch               # recompile on change under templates/<t>/
-pnpm sections:compile --check               # validate only, write nothing
-pnpm sections:check                         # --check --all --strict: every template, warnings fail
+pnpm sections:compile                       # compile templates/ into src/generated/sections/
+pnpm sections:compile --watch               # recompile on any change under templates/
+pnpm sections:compile --check               # validate and resolve only, write nothing
+pnpm sections:compile --strict              # warnings fail the compile
+pnpm sections:check                         # --check --strict
 ```
 
 `package.json` scripts:
 
 ```json
 "sections:compile": "tsx src/engine/compiler/cli.ts",
-"sections:check":   "tsx src/engine/compiler/cli.ts --check --all --strict",
+"sections:check":   "tsx src/engine/compiler/cli.ts --check --strict",
 "predev":           "pnpm sections:compile && pnpm generate:types",
 "prebuild":         "pnpm sections:compile && pnpm generate:types"
 ```
 
-`generate:types` runs after every compile because the generated blocks change `src/payload-types.ts`. `tsx` is already a dev dependency (the e2e script loads it).
+`generate:types` runs after every compile because the generated blocks change `src/payload-types.ts`.
+
+A run prints one report line: `5 sections and 2 globals compiled, 7 files written` after a compile, `ok` after a passing check, or `failed (1 error)` with the diagnostics above it. An unknown option is refused with the usage text.
 
 ## 4. Generated files
 
-All six files carry a first-line header naming the template and the command, and are gitignored (`src/generated/`).
+All six files are gitignored (`src/generated/`). Each TypeScript file starts with two header lines:
+
+```ts
+// Generated by `pnpm sections:compile` from the files under templates/: <what>.
+// Do not edit; change the template files and recompile.
+```
+
+where `<what>` is "what the site is made of" (`manifest.ts`), "one Payload block per section" (`blocks.ts`), "the header and footer globals" (`globals.ts`), "the render plan for every block and global" (`plan.ts`) or "the next/font/google loaders for the theme" (`fonts.ts`). `theme.css` starts with:
+
+```css
+/* Generated by `pnpm sections:compile` from templates/theme.yaml: theme tokens. Do not edit. */
+```
 
 ### `manifest.ts`
 
+What the site is made of, in a shape the seeder, the admin and tests can read without parsing YAML again. The type is `Manifest` in `src/engine/manifest.ts`.
+
 ```ts
-export const manifest = {
-  name: 'template-1',
-  label: 'Studio',
-  blocks: ['template-1-hero-split', 'template-1-features', /* ... */],
+export const manifest: Manifest = {
+  siteName: 'Studio',
+  blocks: ['contact', 'features', 'hero-split', 'latest-posts', 'testimonial' /* ... */],
   globals: ['header', 'footer'],
-} as const
+  sections: {
+    contact: { name: 'contact', slug: 'contact', interfaceName: 'ContactBlock', label: 'Contact', fields: [/* ... */] },
+    /* ... */
+  },
+  globalMeta: {
+    header: { name: 'header', slug: 'header', interfaceName: 'Header', fields: [/* ... */] },
+    footer: { /* ... */ },
+  },
+}
 ```
 
 ### `blocks.ts`
@@ -79,27 +106,26 @@ One `Block` per section, exported by interface name, plus the ordered `blocks` a
 
 ```ts
 import type { Block } from 'payload'
-import { link } from '@/fields/link'
 import { defaultLexical } from '@/fields/defaultLexical'
-import { iconField, rowLabel } from '@/engine/payload/fields'
+import { iconField, linkField, rowLabel } from '@/engine/payload/fields'
 
-export const Template1HeroSplitBlock: Block = {
-  slug: 'template-1-hero-split',
-  interfaceName: 'Template1HeroSplitBlock',
+export const HeroSplitBlock: Block = {
+  slug: 'hero-split',
+  interfaceName: 'HeroSplitBlock',
   labels: { singular: 'Split hero', plural: 'Split heroes' },
-  imageURL: '/sections/template-1/hero-split.png',
+  imageURL: '/sections/hero-split.png',
   admin: { group: 'Heroes' },
   fields: [
     { name: 'eyebrow', type: 'text', label: 'Eyebrow' },
     { name: 'heading', type: 'text', label: 'Heading', required: true },
     { name: 'description', type: 'textarea', label: 'Description' },
-    link({ appearances: false, overrides: { name: 'primaryButton', label: 'Primary button' } }),
-    link({ appearances: false, overrides: { name: 'secondaryButton', label: 'Secondary button' } }),
+    linkField('primaryButton', { label: 'Primary button' }),
+    linkField('secondaryButton', { label: 'Secondary button' }),
     { name: 'image', type: 'upload', relationTo: 'media', label: 'Image', required: true },
   ],
 }
 
-export const blocks: Block[] = [Template1HeroSplitBlock, /* ... */]
+export const blocks: Block[] = [ContactBlock, FeaturesBlock, HeroSplitBlock, /* ... */]
 ```
 
 Field mapping:
@@ -111,7 +137,7 @@ Field mapping:
 | `richText` | `{ type: 'richText', editor: defaultLexical }` |
 | `image` | `{ type: 'upload', relationTo: 'media' }` |
 | `icon` | `iconField(name, options)`: a `select` whose options are the engine's curated icon list |
-| `link` | `link({ appearances: false, overrides: { name, label, required } })` |
+| `link` | `linkField(name, options)`: the project's `link()` group with appearances off, named and labelled, `required` honoured |
 | `select` | `{ type: 'select', options }` |
 | `number` | `{ type: 'number', min?, max? }` |
 | `checkbox` | `{ type: 'checkbox' }` |
@@ -121,7 +147,7 @@ Field mapping:
 
 `label`, `required`, `defaultValue` and `admin.description` (from `help`) are carried on every field. Nothing else is added: no admin-only fields, no empty groups, no `blockName` overrides.
 
-`imageURL` is emitted only when the section declares `preview`; the compiler copies the file to `public/sections/<template>/<section>.<ext>` so the admin can serve it.
+`imageURL` is emitted only when the section declares `preview`; the compiler copies the file to `public/sections/<name>.<ext>` so the admin can serve it.
 
 ### `globals.ts`
 
@@ -131,7 +157,8 @@ import { revalidateGlobal } from '@/engine/payload/revalidateGlobal'
 
 export const Header: GlobalConfig = {
   slug: 'header',
-  typescript: { interface: 'Template1Header' },
+  label: 'Header',
+  typescript: { interface: 'Header' },
   access: { read: () => true },
   fields: [/* mapped exactly as blocks */],
   hooks: { afterChange: [revalidateGlobal('header')] },
@@ -140,7 +167,7 @@ export const Footer: GlobalConfig = { /* ... */ }
 export const globals = [Header, Footer]
 ```
 
-`revalidateGlobal(slug)` is the hand-written factory that replaces the two per-global hook files; it revalidates the `global_<slug>` cache tag that `getCachedGlobal` already uses.
+`revalidateGlobal(slug)` is the hand-written hook factory; it revalidates the `global_<slug>` cache tag that `getCachedGlobal` uses.
 
 ### `plan.ts`
 
@@ -150,7 +177,7 @@ The render plan: one node list per block slug and per global slug, fully resolve
 import type { Plan } from '@/engine/render/types'
 
 export const plans = {
-  'template-1-hero-split': [
+  'hero-split': [
     {
       type: 'div', as: 'section',
       className: 'container grid gap-10 py-20 md:grid-cols-2 md:items-center',
@@ -231,20 +258,20 @@ export const fontVariables = `${sans.variable} ${heading.variable}`
 
 | Thing | Rule | Example |
 | --- | --- | --- |
-| Block slug | `<template>-<section>` | `template-1-hero-split` |
-| Block interface | PascalCase of template and section + `Block` | `Template1HeroSplitBlock` |
+| Block slug | the section's `name` | `hero-split` |
+| Block interface | PascalCase of the section name + `Block` | `HeroSplitBlock` |
 | Global slug | fixed: `header`, `footer` | |
-| Global interface | PascalCase of template + `Header`/`Footer` | `Template1Header` |
+| Global interface | `Header`, `Footer` | |
 | Export in `blocks.ts` | the interface name | |
-
-Two templates can never collide on a block slug, so pages authored under one template keep a recognisable `blockType` even when another template is active.
+| Drawer group | the section's `group`, default `Sections` | `Heroes` |
+| Preview image | `public/sections/<name>.<ext>` | `/sections/hero-split.png` |
 
 ## 6. Errors
 
 Format:
 
 ```
-templates/template-1/sections/hero-split.yaml:27:13
+templates/sections/hero-split.yaml:27:13
   layout[0].children[0].children[4].children[1].button
   "secondaryButon" is not a field of section "hero-split". Did you mean "secondaryButton"?
 ```
@@ -252,38 +279,40 @@ templates/template-1/sections/hero-split.yaml:27:13
 Rules:
 
 - Every error carries the file path relative to the repository, a line and column from the YAML source, the document path, and a one-sentence message. A hint line follows when the compiler can suggest the fix (closest field name, the camelCase form of a hyphenated name, the list of allowed `as` values).
-- All errors in a template are collected and printed together; the compiler does not stop at the first one.
+- A missing required file has no position to point at: it prints the path (`templates/theme.yaml`, `templates/globals/header.yaml`, `templates/globals/footer.yaml`) with `file not found`. A `sections/` folder that is missing or empty prints `templates/sections` with `holds no .yaml files; at least one section is needed`.
+- A global whose `name` is not its file's role is reported at `name`: `globals/header.yaml is the header global, but its name is "footer"; the file is named by its role`. A repeated section name is reported as `section name "hero" is already used by sections/hero.yaml; section names are unique`.
+- All errors are collected and printed together; the compiler does not stop at the first one.
 - Warnings print after errors, prefixed `warning:`. `--strict` promotes them.
 - Internal failures (a bug in the compiler) print a stack trace and exit 2, so they are distinguishable from template errors.
 
 ## 7. Lean output rules
 
 - A block carries exactly the fields its section declares, in declared order.
-- A plan carries exactly the nodes the layout declares. There is no wrapper around a block; spacing is the template's job. (The stock `RenderBlocks` wrapped every block in `my-16`; the engine does not.)
+- A plan carries exactly the nodes the layout declares. There is no wrapper around a block; spacing is the section's job.
 - A `list` query selects only the fields its children reference, plus `slug` for the synthetic `url`.
 - `theme.css` carries only the tokens the theme sets.
 - Unreferenced fields warn, so a block never asks editors for data nothing renders.
 
 ## 8. JSON Schema
 
-`pnpm sections:compile` also writes `templates/schema.json` from the zod definitions (zod 4's `toJSONSchema`), using a discriminator on the top-level `kind` (`template`, `theme`, `section`, `global`) so one schema file serves every template file. It is committed, and the compiler fails when the committed file differs from the generated one so the two cannot drift.
+`pnpm sections:compile` also writes `templates/schema.json` from the zod definitions (zod 4's `toJSONSchema`, draft 7). It is one union of the theme, section and global schemas, so the same file serves every file under `templates/`; an editor picks the branch by shape, and by `kind` where a file carries one. It is committed, and `--check` reports when the committed file differs from the generated one so the two cannot drift.
 
 ## 9. Tailwind
 
-Class strings are authored in YAML and copied into `plan.ts`. Tailwind 4's automatic source detection skips gitignored paths, which `src/generated/` is, so the stylesheet declares the template folder as a source explicitly:
+Class strings are authored in YAML and copied into `plan.ts`. Tailwind 4's automatic source detection skips gitignored paths, which `src/generated/` is, so the stylesheet declares the templates folder as a source explicitly:
 
 ```css
 @source "../../../templates";
 ```
 
-That is the whole of `templates/`, so the CSS contains the union of both faces' utilities. It is small and it keeps the directive static; narrowing it to the active template is listed in [build-plan.md](build-plan.md) under open issues.
-
 ## 10. Tests
 
 `tests/int/engine/compiler.int.spec.ts` (Vitest already includes `tests/int/**/*.int.spec.ts`):
 
-- Fixtures under `tests/fixtures/templates/`: a minimal valid template, and one broken fixture per validation rule in [template-format.md section 9](template-format.md#9-validation-rules). Each broken fixture asserts the file, path and message of its error.
-- A snapshot of every generated file for `templates/template-1` and `templates/template-2`, so a change in emission is a reviewed diff.
-- Determinism: compiling twice yields identical bytes.
-- `select` derivation: a `list` whose children reference `title` and `meta.image` selects exactly `{ title: true, slug: true, meta: { image: true } }`.
-- The committed `templates/schema.json` equals the generated one.
+- **Broken fixtures** under `tests/fixtures/templates/broken/`: twelve, one per validation rule in [template-format.md section 9](template-format.md#9-validation-rules), numbered by rule (`01-global-name-mismatch` is a global file whose `name` is not its role). Each asserts the file, path and message of its error.
+- **Missing files:** each required file that is missing is named, with no position.
+- **valid-minimal** (`tests/fixtures/templates/valid-minimal/`, `siteName: Minimal`): compiles without diagnostics, writes the six files plus `schema.json`, is deterministic and writes nothing the second time, and in check mode writes nothing and reports `schema.json` drift.
+- **`templates/`:** passes `sections:check`; compiles one block per file under `templates/sections`, named by the section, in name order; each of the six generated files is snapshotted at `tests/int/engine/__snapshots__/compiler/<file>.snap`, so a change in emission is a reviewed diff.
+- **List select derivation:** a `list` whose children reference `title` and `meta.image` selects exactly `{ title: true, slug: true, meta: { image: true } }`.
+- **`templates/schema.json`** equals the schema generated from `src/engine/schema`.
+- **CLI arguments:** the documented flags parse; an unknown option is refused.
