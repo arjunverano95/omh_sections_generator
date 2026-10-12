@@ -140,7 +140,7 @@ Six phases. Each ends in a state that runs and is committed on its own. Phase 2 
 ## Verification Checklist
 
 - [x] `pnpm sections:check` passes for both templates with `--strict` (`template-1: ok`, `template-2: ok`)
-- [ ] `pnpm test:int` passes: compiler fixtures, snapshots, renderer, seeder. 96 tests in 5 files. The compiler, renderer, seeder and Lexical suites are green; the three template-2 snapshot tests compare the shipped folder with its committed output, so they fail while any scratch section sits under `templates/template-2/sections/`. Tick after a run on the folder as committed.
+- [x] `pnpm test:int` passes: compiler fixtures, snapshots, renderer, seeder (96 tests in 5 files). The template snapshot tests compile the shipped folders, so a scratch section left under `templates/<t>/sections/` fails them until it is removed.
 - [x] `pnpm lint` (0 errors, 8 stock warnings), `tsc --noEmit` and `pnpm build` pass with each template active
 - [x] Both faces: seed, home renders, form submits and the submission is in the admin (the `Sections` e2e suite, 7 of 7 per face); every section of the Launch home lists under Layout in the admin with its label and its fields; Live Preview renders the page beside the form
 - [x] R8 acceptance: a `quote-band.yaml` added under `templates/template-2/sections/` compiled, appeared in the admin's Add Layout drawer under its group, and `git status` showed nothing under `src/`
