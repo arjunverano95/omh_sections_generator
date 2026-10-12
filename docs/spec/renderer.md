@@ -42,7 +42,7 @@ Every primitive is a server component except `Form`. Each receives the node, the
 | `Container` | `<{as} className>{children}</{as}>` | |
 | `Each` | for each row: `RenderTree(children, [row, ...scope])`; rows are wrapped in `{as}` when `as` is set, each row keyed by its `id`. | |
 | `List` | section 4 | |
-| `Form` | section 5 | `src/blocks/Form` |
+| `Form` | section 5 | `src/engine/primitives/form` |
 
 The registry maps `node.type` to a primitive and is the one place a new primitive is registered. A node type missing from the registry is unreachable (the compiler validates against the same list) and throws in development.
 
@@ -58,30 +58,31 @@ No documents means no output, consistent with section 2. The query is not cached
 
 ## 5. `Form`
 
-The one client boundary. `Form` is the existing `FormBlock` component moved under `src/engine/primitives/form/` with its field components, stripped of its block-specific props (`enableIntro`, `introContent`) and given `className`. It keeps its behaviour: builds inputs from the form document's fields, posts to `/api/form-submissions`, shows the confirmation message or redirects. The form document arrives populated because the `form` field is a relationship and the page query runs at depth 2, as the stock template already does.
+The one client boundary. `Form` is the stock `FormBlock` component with its field components, kept under `src/engine/primitives/form/`, without the block-specific props (`enableIntro`, `introContent`) and with `className`. It keeps the stock behaviour: builds inputs from the form document's fields, posts to `/api/form-submissions`, shows the confirmation message or redirects. The form document arrives populated because the `form` field is a relationship and the page query runs at depth 2, as the stock template already does.
 
 ## 6. Theme application
 
 The renderer never reads the theme. Variants were merged into `className` at compile time, and tokens apply through CSS:
 
 - `src/app/(frontend)/layout.tsx` imports `@/generated/sections/theme.css` after `./globals.css`, and adds `fontVariables` from `@/generated/sections/fonts` to the `<html>` class list in place of the Geist Sans variable (Geist Mono stays).
-- `globals.css` declares the slot `--font-heading: var(--font-sans)` inside `@theme` so the `font-heading` utility exists for every template; `theme.css` sets its value.
+- `globals.css` declares the slot `--font-heading: var(--font-sans)` inside `@theme` so the `font-heading` utility always exists; `theme.css` sets its value.
 
-Dark mode continues to work through the existing `[data-theme='dark']` variant and theme selector; `theme.css` overrides the tokens under the same selector.
+The palette comes from the theme's `colorMode`, which the frontend's theme script reads from the generated manifest: `light` and `dark` set that palette for every visitor, `system` follows the device setting. Dark styling works through the existing `[data-theme='dark']` variant; `theme.css` overrides the tokens under the same selector. There is no visitor switch.
 
 ## 7. Server and client
 
 - `RenderSections`, `RenderGlobal`, `RenderTree` and every primitive but `Form` are server components, so the layout tree adds no client JavaScript.
 - `Button` renders `CMSLink`, which is a server component in the stock template.
 - Live preview needs no change: the existing `LivePreviewListener` refreshes the server-rendered page and the renderer is a pure function of the data it is given.
-- The header has no client-side mobile menu in this version; the demo faces hide the nav below `md` and rely on the footer links. A `details`/`summary` disclosure is the planned config-only fix and is listed as an open issue.
+- Native disclosures need no client code: a `div` with `as: details` holding a `text` with `as: summary` opens and closes in the browser, as the FAQ section's items do.
+- The Studio header has no mobile menu; it hides the nav below `md` and relies on the footer links. A menu built from the same `details` and `summary` tags is the config-only follow-up, listed as an open issue.
 
 ## 8. Accessibility defaults
 
-- Headings come from `as`; templates are expected to keep one `h1` per page, which the demo seeds do.
+- Headings come from `as`; a page is expected to carry one `h1`, which every seeded page does (each opens with a hero).
 - `Image` carries the media document's `alt`. An image without alt text is an editor error the media collection already enforces.
-- `Icon` is decorative (`aria-hidden`); meaningful icons sit next to text in the demo faces.
-- `Each` with `as: ul` renders rows as the template's `li` nodes; the compiler warns when a `ul` has non-`li` children ([template-format.md section 9](template-format.md#9-validation-rules)).
+- `Icon` is decorative (`aria-hidden`); meaningful icons sit next to text in the demo site.
+- `Each` with `as: ul` renders rows as the section's `li` nodes; the compiler warns when a `ul` has non-`li` children ([template-format.md section 9](template-format.md#9-validation-rules)).
 - `Button` renders a real anchor through `CMSLink`; `newTab` adds `rel="noopener noreferrer"`.
 
 ## 9. Tests
