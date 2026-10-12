@@ -26,16 +26,33 @@ export function resolve(ref: Located, scope: Scope): unknown {
   return value
 }
 
+/** A `link` field's group, recognised by its `type` radio. */
+const isLink = (value: unknown): value is Record<string, unknown> =>
+  isObject(value) && (value.type === 'custom' || value.type === 'reference')
+
+/** A link has a target when it is custom with a URL, or a reference to a document or its id. */
+function hasTarget(link: Record<string, unknown>): boolean {
+  if (link.type === 'custom') return typeof link.url === 'string' && link.url.trim() !== ''
+  const reference = link.reference
+  if (!isObject(reference)) return false
+  const target = reference.value
+  return (
+    isObject(target) || (typeof target === 'string' && target !== '') || typeof target === 'number'
+  )
+}
+
 /**
- * Empty means absent: `undefined`, `null`, `''`, `[]`. Unpopulated relations are judged by the
- * primitive that expects a document, because only it knows an id is not enough.
+ * Empty means absent: `undefined`, `null`, `''`, `[]`, and a link with no target. Unpopulated
+ * relations are judged by the primitive that expects a document, because only it knows an id
+ * is not enough.
  */
 export function isEmpty(value: unknown): boolean {
   return (
     value === undefined ||
     value === null ||
     (typeof value === 'string' && value.trim() === '') ||
-    (Array.isArray(value) && value.length === 0)
+    (Array.isArray(value) && value.length === 0) ||
+    (isLink(value) && !hasTarget(value))
   )
 }
 

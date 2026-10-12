@@ -1,6 +1,7 @@
-import type { SelectField } from 'payload'
+import type { Field, SelectField } from 'payload'
 
 import { ICON_NAMES } from '@/engine/icons'
+import { link } from '@/fields/link'
 
 type IconFieldOptions = {
   label: string
@@ -39,4 +40,45 @@ export function rowLabel(field: string) {
     path: '@/engine/payload/RowLabel#RowLabel',
     clientProps: { field },
   } as const
+}
+
+type LinkFieldOptions = {
+  label: string
+  required?: boolean
+  admin?: { description?: string }
+}
+
+/** The inner fields the stock link group marks required. */
+const LINK_REQUIRED_FIELDS = new Set(['label', 'reference', 'url'])
+
+/** Clears `required` on the link group's own fields, inside its rows. */
+function relaxLinkFields(fields: Field[]): Field[] {
+  return fields.map((field) => {
+    if (field.type === 'row') return { ...field, fields: relaxLinkFields(field.fields) }
+    if ('name' in field && LINK_REQUIRED_FIELDS.has(field.name)) {
+      return { ...field, required: false } as Field
+    }
+    return field
+  })
+}
+
+/**
+ * The stock link group without appearances. An optional link must be leavable empty, but the
+ * stock group requires its label and destination, so those are relaxed unless the link itself
+ * is required.
+ */
+export function linkField(name: string, options: LinkFieldOptions): Field {
+  const { label, required, admin } = options
+
+  const field = link({
+    appearances: false,
+    overrides: {
+      name,
+      label,
+      ...(admin?.description !== undefined ? { admin: { description: admin.description } } : {}),
+    },
+  })
+
+  if (required === true || field.type !== 'group') return field
+  return { ...field, fields: relaxLinkFields(field.fields) }
 }

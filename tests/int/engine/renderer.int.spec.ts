@@ -25,7 +25,7 @@ vi.mock('@payloadcms/ui/icons/Copy', () => ({ CopyIcon: () => null }))
 
 import { ICONS } from '@/engine/icons'
 import { iconComponents } from '@/engine/payload/iconComponents'
-import { iconField, rowLabel } from '@/engine/payload/fields'
+import { iconField, linkField, rowLabel } from '@/engine/payload/fields'
 import { RowLabel } from '@/engine/payload/RowLabel'
 import { revalidateGlobal } from '@/engine/payload/revalidateGlobal'
 import { fillWhere } from '@/engine/primitives/List'
@@ -679,5 +679,80 @@ describe('payload helpers', () => {
       typeof hook
     >[0])
     expect(mocks.revalidateTag).not.toHaveBeenCalled()
+  })
+})
+
+describe('follow-ups', () => {
+  it('text renders a select label where the plan carries one, else the value', async () => {
+    const node = {
+      type: 'text',
+      source: { path: ['tier'] },
+      as: 'span',
+      labels: { pro: 'Professional' },
+    } as PlanNode
+    expect((await render([node], [{ tier: 'pro' }])).innerHTML).toBe('<span>Professional</span>')
+    expect((await render([node], [{ tier: 'team' }])).innerHTML).toBe('<span>team</span>')
+  })
+
+  it('a link with no target is empty for if and for Button', async () => {
+    const empties = [
+      { type: 'custom', url: '', label: 'Go' },
+      { type: 'custom', label: 'Go' },
+      { type: 'reference', reference: null, label: 'Go' },
+      { type: 'reference', reference: { relationTo: 'pages', value: null }, label: 'Go' },
+    ]
+    for (const cta of empties) {
+      expect(testCondition({ path: ['cta'] }, [{ cta }])).toBe(false)
+      const el = await render(
+        [
+          {
+            type: 'button',
+            source: { path: ['cta'] },
+            children: [{ type: 'text', source: { value: 'Logo' }, as: 'span' }],
+          },
+        ],
+        [{ cta }],
+      )
+      expect(el.innerHTML).toBe('')
+    }
+
+    const targets = [
+      { type: 'custom', url: '/x' },
+      { type: 'reference', reference: { relationTo: 'pages', value: 'p1' } },
+      { type: 'reference', reference: { relationTo: 'pages', value: { id: 'p1', slug: 'about' } } },
+    ]
+    for (const cta of targets) expect(testCondition({ path: ['cta'] }, [{ cta }])).toBe(true)
+  })
+
+  it('linkField relaxes the inner fields unless the link is required', () => {
+    type Named = { name?: string; type: string; required?: boolean; fields?: Named[] }
+    const requiredOf = (field: Named): Record<string, boolean | undefined> => {
+      const out: Record<string, boolean | undefined> = {}
+      const walk = (fields: Named[]) =>
+        fields.forEach((f) => {
+          if (f.type === 'row' && f.fields) walk(f.fields)
+          else if (f.name) out[f.name] = f.required
+        })
+      walk(field.fields ?? [])
+      return out
+    }
+
+    const optional = linkField('cta', {
+      label: 'Call to action',
+      admin: { description: 'Top right' },
+    }) as unknown as Named & {
+      label: string
+      admin: { description?: string }
+    }
+    expect(optional).toMatchObject({ name: 'cta', type: 'group', label: 'Call to action' })
+    expect(optional.admin.description).toBe('Top right')
+    expect(requiredOf(optional)).toMatchObject({ label: false, reference: false, url: false })
+    expect(requiredOf(optional)).not.toHaveProperty('appearance')
+
+    const required = linkField('cta', {
+      label: 'Call to action',
+      required: true,
+    }) as unknown as Named
+    expect(requiredOf(required)).toMatchObject({ label: true, reference: true, url: true })
   })
 })

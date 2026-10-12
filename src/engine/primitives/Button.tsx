@@ -6,7 +6,7 @@ import type { ButtonNode, Scope } from '@/engine/render/types'
 import { CMSLink } from '@/components/Link'
 import { RenderTree } from '@/engine/render/RenderTree'
 import { isButtonLiteral, isRef } from '@/engine/render/types'
-import { resolve } from '@/engine/render/scope'
+import { isEmpty, resolve } from '@/engine/render/scope'
 
 type LinkProps = Pick<
   React.ComponentProps<typeof CMSLink>,
@@ -32,7 +32,7 @@ function linkFor(node: ButtonNode, scope: Scope): LinkProps | undefined {
 
   if (!isButtonLiteral(source)) {
     const group = resolve(source, scope)
-    return isObject(group) ? fromGroup(group) : undefined
+    return isObject(group) && !isEmpty(group) ? fromGroup(group) : undefined
   }
 
   const href = isRef(source.href) ? resolve(source.href, scope) : source.href.value
@@ -40,7 +40,7 @@ function linkFor(node: ButtonNode, scope: Scope): LinkProps | undefined {
   const target: LinkProps | undefined =
     typeof href === 'string'
       ? { type: 'custom', url: href }
-      : isObject(href)
+      : isObject(href) && !isEmpty(href)
         ? fromGroup(href)
         : undefined
   if (!target) return undefined
