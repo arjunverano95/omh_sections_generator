@@ -4,7 +4,7 @@
  *   pnpm exec tsx scripts/placeholder-media.ts <out.jpg> <width>x<height> "<label>" [from] [to]
  *
  * `from` and `to` are CSS colours. With one colour the image is solid; with two it is a
- * diagonal gradient. The label is centred in white. Output is a progressive mozjpeg at a
+ * diagonal gradient. The label is centred in white; an empty label gives a plain gradient. Output is a progressive mozjpeg at a
  * quality that keeps a 1600x1200 image well under 60 KB.
  */
 import { mkdir } from 'node:fs/promises'
@@ -46,7 +46,11 @@ function parseArgs(argv: string[]): Options {
 }
 
 export function placeholderSvg({ width, height, label, from, to }: Omit<Options, 'out'>): string {
-  const fontSize = Math.round(Math.min(width, height) / 9)
+  // An image at least twice as wide as it is tall is a wordmark: the label fills its width.
+  const wordmark = width >= height * 2 && label.length > 0
+  const fontSize = Math.round(
+    wordmark ? Math.min(height / 2.5, (width * 0.85) / (label.length * 0.6)) : Math.min(width, height) / 9,
+  )
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">

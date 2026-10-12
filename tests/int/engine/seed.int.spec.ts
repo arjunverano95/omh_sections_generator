@@ -19,6 +19,23 @@ const { resolveValues } = await import('@/engine/seed/resolve')
 
 const TEMPLATES_DIR = path.resolve('templates')
 
+/** Every file under templates/seed/media that a page or global references. */
+const STUDIO_MEDIA = [
+  'avatar.jpg',
+  'hero.jpg',
+  'how-we-work-browser.jpg',
+  'how-we-work-handover.jpg',
+  'how-we-work-reading.jpg',
+  'logo-ashgrove-press.jpg',
+  'logo-fernhall.jpg',
+  'logo-halden-review.jpg',
+  'logo-kestrel-and-vane.jpg',
+  'logo-meridian-quarterly.jpg',
+  'logo-northlight.jpg',
+  'logo.svg',
+  'services-hero.jpg',
+]
+
 // --- the manifest the compiler would emit for templates/, written out by hand ---
 
 const f = (name: string, type: FieldMeta['type'], extra: Partial<FieldMeta> = {}): FieldMeta => ({
@@ -39,7 +56,19 @@ const section = (name: string, fields: FieldMeta[]): SectionMeta => ({
 
 const manifest: Manifest = {
   siteName: 'Studio',
-  blocks: ['hero-split', 'features', 'latest-posts', 'testimonial', 'contact'],
+  blocks: [
+    'contact',
+    'cta-band',
+    'feature-rows',
+    'features',
+    'hero-centered',
+    'hero-split',
+    'latest-posts',
+    'logo-strip',
+    'newsletter',
+    'pricing',
+    'testimonial',
+  ],
   globals: ['header', 'footer'],
   sections: {
     'hero-split': section('hero-split', [
@@ -72,6 +101,52 @@ const manifest: Manifest = {
       f('avatar', 'image'),
     ]),
     contact: section('contact', [f('heading', 'text'), f('text', 'textarea'), f('form', 'form', { required: true })]),
+    'cta-band': section('cta-band', [f('heading', 'text', { required: true }), f('text', 'textarea'), f('button', 'link')]),
+    'feature-rows': section('feature-rows', [
+      f('rows', 'array', {
+        min: 1,
+        max: 6,
+        fields: [
+          f('title', 'text', { required: true }),
+          f('body', 'richText'),
+          f('image', 'image', { required: true }),
+          f('reverse', 'checkbox'),
+        ],
+      }),
+    ]),
+    'hero-centered': section('hero-centered', [
+      f('badge', 'text'),
+      f('heading', 'text', { required: true }),
+      f('description', 'textarea'),
+      f('primaryButton', 'link'),
+      f('secondaryButton', 'link'),
+      f('backgroundImage', 'image'),
+      f('bullets', 'array', { max: 4, fields: [f('icon', 'icon'), f('text', 'text')] }),
+    ]),
+    'logo-strip': section('logo-strip', [
+      f('heading', 'text'),
+      f('logos', 'array', {
+        min: 1,
+        max: 8,
+        fields: [f('image', 'image', { required: true }), f('name', 'text', { required: true })],
+      }),
+    ]),
+    newsletter: section('newsletter', [f('heading', 'text'), f('text', 'textarea'), f('form', 'form', { required: true })]),
+    pricing: section('pricing', [
+      f('heading', 'text'),
+      f('plans', 'array', {
+        min: 1,
+        max: 3,
+        fields: [
+          f('name', 'text', { required: true }),
+          f('price', 'number', { required: true }),
+          f('period', 'select', { options: ['month', 'year'].map((value) => ({ value, label: value })) }),
+          f('features', 'array', { max: 8, fields: [f('text', 'text', { required: true })] }),
+          f('button', 'link'),
+          f('highlighted', 'checkbox'),
+        ],
+      }),
+    ]),
   },
   globalMeta: {
     header: {
@@ -239,8 +314,8 @@ describe('resolveValues', () => {
 describe('planSeed', () => {
   it('accepts the seed under templates/ and lists what it needs', async () => {
     const plan = await planSeed(TEMPLATES_DIR, manifest)
-    expect(plan.site.pages.map((page) => page.slug)).toEqual(['home', 'contact'])
-    expect(plan.siteMedia.sort()).toEqual(['avatar.jpg', 'hero.jpg', 'logo.svg'])
+    expect(plan.site.pages.map((page) => page.slug)).toEqual(['home', 'contact', 'services'])
+    expect(plan.siteMedia.sort()).toEqual([...STUDIO_MEDIA].sort())
     expect(plan.categories.map((category) => category.slug)).toEqual(['technology', 'news', 'finance'])
   })
 
@@ -264,7 +339,7 @@ describe('planSeed', () => {
           '        image: "@media/missing.jpg"',
           '    - contact:',
           '        form: "@form/nope"',
-          '    - pricing: {}',
+          '    - gallery: {}',
         ].join('\n'),
       )
       const error = await planSeed(dir, manifest).catch((e: unknown) => e)
@@ -274,7 +349,7 @@ describe('planSeed', () => {
         expect.objectContaining({ where: 'page "home", section "hero-split" (sections[0])', path: 'headin' }),
         expect.objectContaining({ where: 'page "home", section "hero-split" (sections[0])', path: 'heading', message: 'is required' }),
         expect.objectContaining({ where: 'page "home", section "contact" (sections[1])', message: '"@form/nope" names no form in the seed' }),
-        expect.objectContaining({ where: 'page "home", section "pricing" (sections[2])', message: expect.stringMatching(/not a section; the sections are hero-split/) }),
+        expect.objectContaining({ where: 'page "home", section "gallery" (sections[2])', message: expect.stringMatching(/not a section; the sections are hero-split/) }),
       ])
       expect((error as Error).message).toContain('pages.yaml: page "home", section "hero-split" (sections[0]), field "heading": is required')
     })
@@ -303,18 +378,18 @@ describe('seedSite', () => {
     expect(lastIndex('create:pages')).toBeLessThan(firstIndex('update:pages'))
     expect(lastIndex('update:pages')).toBeLessThan(firstIndex('updateGlobal:header'))
 
-    expect(summary).toEqual({ categories: 3, media: 6, posts: 3, forms: 1, pages: 2, globals: ['header', 'footer'] })
+    expect(summary).toEqual({ categories: 3, media: 16, posts: 3, forms: 2, pages: 3, globals: ['header', 'footer'] })
 
     // Each media file is uploaded once, even when referenced twice (hero.jpg: hero and meta image).
     const uploads = calls.filter((call) => call.collection === 'media').map((call) => path.basename(call.args.filePath as string))
-    expect(uploads.sort()).toEqual(['avatar.jpg', 'hero.jpg', 'logo.svg', 'post-1.jpg', 'post-2.jpg', 'post-3.jpg'])
+    expect(uploads.sort()).toEqual([...STUDIO_MEDIA, 'post-1.jpg', 'post-2.jpg', 'post-3.jpg'].sort())
     expect(calls.find((call) => String(call.args.filePath).endsWith('hero.jpg'))!.args.data).toEqual({
       alt: 'Blue and sand gradient with the word Studio',
     })
 
     // Pass 1 creates drafts; pass 2 publishes the full layout with links resolved to ids.
     const created = calls.filter((call) => call.op === 'create' && call.collection === 'pages')
-    expect(created.map((call) => call.args.draft)).toEqual([true, true])
+    expect(created.map((call) => call.args.draft)).toEqual([true, true, true])
     const pageId = (slug: string) => created.find((call) => (call.args.data as { slug: string }).slug === slug)!.id
 
     const home = calls.find((call) => call.op === 'update' && call.args.id === pageId('home'))!.args.data as {
@@ -344,6 +419,28 @@ describe('seedSite', () => {
     }
     expect(contact.layout[0]).not.toHaveProperty('image')
 
+    // The Services page uses the six sections the Home page does not, with the newsletter form.
+    const services = calls.find((call) => call.op === 'update' && call.args.id === pageId('services'))!.args.data as {
+      layout: Record<string, unknown>[]
+    }
+    expect(services.layout.map((row) => row.blockType)).toEqual([
+      'hero-centered',
+      'logo-strip',
+      'feature-rows',
+      'pricing',
+      'cta-band',
+      'newsletter',
+    ])
+    const plans = services.layout[3]!.plans as { name: string; highlighted: boolean }[]
+    expect(plans.map((plan) => [plan.name, plan.highlighted])).toEqual([
+      ['Sprint', false],
+      ['Retainer', true],
+      ['Partner', false],
+    ])
+    expect((services.layout[1]!.logos as { image: string }[]).every((logo) => logo.image.startsWith('media-'))).toBe(true)
+    expect(services.layout[5]!.form).toMatch(/^forms-/)
+    expect(services.layout[5]!.form).not.toBe(home.layout[4]!.form)
+
     // A form's confirmation message is rich text, converted with the forms field's editor.
     const form = calls.find((call) => call.collection === 'forms')!.args.data as Record<string, unknown>
     expect(form.confirmationMessage).toEqual({
@@ -358,7 +455,7 @@ describe('seedSite', () => {
 
     const header = calls.find((call) => call.slug === 'header')!.args
     expect(header.context).toEqual({ disableRevalidate: true })
-    expect((header.data as { navItems: unknown[] }).navItems).toHaveLength(3)
+    expect((header.data as { navItems: unknown[] }).navItems).toHaveLength(4)
   })
 
   it('passes a form redirect through and converts each notification email message', async () => {
@@ -412,7 +509,7 @@ describe('seedSite', () => {
 describe('getHomeFallback', () => {
   it('returns the home layout as rows that need no documents', async () => {
     const rows = await getHomeFallback(TEMPLATES_DIR, manifest)
-    expect(rows.map((row) => row.blockType)).toEqual(manifest.blocks)
+    expect(rows.map((row) => row.blockType)).toEqual(['hero-split', 'features', 'latest-posts', 'testimonial', 'contact'])
     const [hero, , posts, testimonial, contact] = rows
     expect(hero).not.toHaveProperty('image')
     expect(hero!.primaryButton).toEqual({ type: 'custom', url: '/contact', label: 'Start a project', newTab: false })

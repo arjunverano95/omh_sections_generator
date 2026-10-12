@@ -267,7 +267,19 @@ export interface User {
 export interface Page {
   id: string;
   title: string;
-  layout: (ContactBlock | FeaturesBlock | HeroSplitBlock | LatestPostsBlock | TestimonialBlock)[];
+  layout: (
+    | ContactBlock
+    | CtaBandBlock
+    | FeatureRowsBlock
+    | FeaturesBlock
+    | HeroCenteredBlock
+    | HeroSplitBlock
+    | LatestPostsBlock
+    | LogoStripBlock
+    | NewsletterBlock
+    | PricingBlock
+    | TestimonialBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -468,114 +480,12 @@ export interface Textarea {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "FeaturesBlock".
+ * via the `definition` "CtaBandBlock".
  */
-export interface FeaturesBlock {
-  heading?: string | null;
-  intro?: string | null;
-  columns?: ('2' | '3' | '4') | null;
-  items?:
-    | {
-        icon?:
-          | (
-              | 'activity'
-              | 'arrow-right'
-              | 'arrow-up-right'
-              | 'at-sign'
-              | 'award'
-              | 'badge-check'
-              | 'bell'
-              | 'book-open'
-              | 'bookmark'
-              | 'briefcase'
-              | 'building'
-              | 'calendar'
-              | 'camera'
-              | 'check'
-              | 'chevron-right'
-              | 'circle-check'
-              | 'clock'
-              | 'cloud'
-              | 'code'
-              | 'coffee'
-              | 'compass'
-              | 'cpu'
-              | 'credit-card'
-              | 'database'
-              | 'download'
-              | 'external-link'
-              | 'eye'
-              | 'feather'
-              | 'flag'
-              | 'gift'
-              | 'globe'
-              | 'graduation-cap'
-              | 'headphones'
-              | 'heart'
-              | 'home'
-              | 'image'
-              | 'key'
-              | 'layers'
-              | 'layout-grid'
-              | 'leaf'
-              | 'lightbulb'
-              | 'link'
-              | 'lock'
-              | 'mail'
-              | 'map'
-              | 'map-pin'
-              | 'megaphone'
-              | 'message-circle'
-              | 'monitor'
-              | 'moon'
-              | 'package'
-              | 'palette'
-              | 'pen-tool'
-              | 'phone'
-              | 'play'
-              | 'plus'
-              | 'quote'
-              | 'rocket'
-              | 'rss'
-              | 'search'
-              | 'send'
-              | 'settings'
-              | 'shield'
-              | 'shopping-cart'
-              | 'smartphone'
-              | 'sparkles'
-              | 'star'
-              | 'sun'
-              | 'tag'
-              | 'target'
-              | 'terminal'
-              | 'trending-up'
-              | 'truck'
-              | 'upload'
-              | 'user'
-              | 'users'
-              | 'wifi'
-              | 'zap'
-            )
-          | null;
-        title: string;
-        text?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'features';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HeroSplitBlock".
- */
-export interface HeroSplitBlock {
-  eyebrow?: string | null;
+export interface CtaBandBlock {
   heading: string;
-  description?: string | null;
-  primaryButton?: {
+  text?: string | null;
+  button?: {
     type?: ('reference' | 'custom') | null;
     newTab?: boolean | null;
     reference?:
@@ -590,28 +500,9 @@ export interface HeroSplitBlock {
     url?: string | null;
     label?: string | null;
   };
-  secondaryButton?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: string | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: string | Post;
-        } | null);
-    url?: string | null;
-    label?: string | null;
-  };
-  /**
-   * Optional. Without an image the copy spans the full width.
-   */
-  image?: (string | null) | Media;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'hero-split';
+  blockType: 'cta-band';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -794,6 +685,308 @@ export interface Category {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureRowsBlock".
+ */
+export interface FeatureRowsBlock {
+  rows?:
+    | {
+        title: string;
+        body?: LexicalRichText<LexicalNodes_AD327369> | null;
+        image: string | Media;
+        /**
+         * Put the image on the left.
+         */
+        reverse?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'feature-rows';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeaturesBlock".
+ */
+export interface FeaturesBlock {
+  heading?: string | null;
+  intro?: string | null;
+  columns?: ('2' | '3' | '4') | null;
+  items?:
+    | {
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-right'
+              | 'arrow-up-right'
+              | 'at-sign'
+              | 'award'
+              | 'badge-check'
+              | 'bell'
+              | 'book-open'
+              | 'bookmark'
+              | 'briefcase'
+              | 'building'
+              | 'calendar'
+              | 'camera'
+              | 'check'
+              | 'chevron-right'
+              | 'circle-check'
+              | 'clock'
+              | 'cloud'
+              | 'code'
+              | 'coffee'
+              | 'compass'
+              | 'cpu'
+              | 'credit-card'
+              | 'database'
+              | 'download'
+              | 'external-link'
+              | 'eye'
+              | 'feather'
+              | 'flag'
+              | 'gift'
+              | 'globe'
+              | 'graduation-cap'
+              | 'headphones'
+              | 'heart'
+              | 'home'
+              | 'image'
+              | 'key'
+              | 'layers'
+              | 'layout-grid'
+              | 'leaf'
+              | 'lightbulb'
+              | 'link'
+              | 'lock'
+              | 'mail'
+              | 'map'
+              | 'map-pin'
+              | 'megaphone'
+              | 'message-circle'
+              | 'monitor'
+              | 'moon'
+              | 'package'
+              | 'palette'
+              | 'pen-tool'
+              | 'phone'
+              | 'play'
+              | 'plus'
+              | 'quote'
+              | 'rocket'
+              | 'rss'
+              | 'search'
+              | 'send'
+              | 'settings'
+              | 'shield'
+              | 'shopping-cart'
+              | 'smartphone'
+              | 'sparkles'
+              | 'star'
+              | 'sun'
+              | 'tag'
+              | 'target'
+              | 'terminal'
+              | 'trending-up'
+              | 'truck'
+              | 'upload'
+              | 'user'
+              | 'users'
+              | 'wifi'
+              | 'zap'
+            )
+          | null;
+        title: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'features';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroCenteredBlock".
+ */
+export interface HeroCenteredBlock {
+  badge?: string | null;
+  heading: string;
+  description?: string | null;
+  primaryButton?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  secondaryButton?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Optional. Shown faintly behind the copy.
+   */
+  backgroundImage?: (string | null) | Media;
+  bullets?:
+    | {
+        icon?:
+          | (
+              | 'activity'
+              | 'arrow-right'
+              | 'arrow-up-right'
+              | 'at-sign'
+              | 'award'
+              | 'badge-check'
+              | 'bell'
+              | 'book-open'
+              | 'bookmark'
+              | 'briefcase'
+              | 'building'
+              | 'calendar'
+              | 'camera'
+              | 'check'
+              | 'chevron-right'
+              | 'circle-check'
+              | 'clock'
+              | 'cloud'
+              | 'code'
+              | 'coffee'
+              | 'compass'
+              | 'cpu'
+              | 'credit-card'
+              | 'database'
+              | 'download'
+              | 'external-link'
+              | 'eye'
+              | 'feather'
+              | 'flag'
+              | 'gift'
+              | 'globe'
+              | 'graduation-cap'
+              | 'headphones'
+              | 'heart'
+              | 'home'
+              | 'image'
+              | 'key'
+              | 'layers'
+              | 'layout-grid'
+              | 'leaf'
+              | 'lightbulb'
+              | 'link'
+              | 'lock'
+              | 'mail'
+              | 'map'
+              | 'map-pin'
+              | 'megaphone'
+              | 'message-circle'
+              | 'monitor'
+              | 'moon'
+              | 'package'
+              | 'palette'
+              | 'pen-tool'
+              | 'phone'
+              | 'play'
+              | 'plus'
+              | 'quote'
+              | 'rocket'
+              | 'rss'
+              | 'search'
+              | 'send'
+              | 'settings'
+              | 'shield'
+              | 'shopping-cart'
+              | 'smartphone'
+              | 'sparkles'
+              | 'star'
+              | 'sun'
+              | 'tag'
+              | 'target'
+              | 'terminal'
+              | 'trending-up'
+              | 'truck'
+              | 'upload'
+              | 'user'
+              | 'users'
+              | 'wifi'
+              | 'zap'
+            )
+          | null;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero-centered';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroSplitBlock".
+ */
+export interface HeroSplitBlock {
+  eyebrow?: string | null;
+  heading: string;
+  description?: string | null;
+  primaryButton?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  secondaryButton?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Optional. Without an image the copy spans the full width.
+   */
+  image?: (string | null) | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero-split';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "LatestPostsBlock".
  */
 export interface LatestPostsBlock {
@@ -820,6 +1013,81 @@ export interface LatestPostsBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'latest-posts';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LogoStripBlock".
+ */
+export interface LogoStripBlock {
+  heading?: string | null;
+  logos?:
+    | {
+        image: string | Media;
+        /**
+         * The client's name; labels the row in the admin and is read out to screen readers.
+         */
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'logo-strip';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "NewsletterBlock".
+ */
+export interface NewsletterBlock {
+  heading?: string | null;
+  text?: string | null;
+  form: string | Form;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'newsletter';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricingBlock".
+ */
+export interface PricingBlock {
+  heading?: string | null;
+  plans?:
+    | {
+        name: string;
+        /**
+         * Price in US dollars, without the currency sign.
+         */
+        price: number;
+        period?: ('month' | 'year') | null;
+        features?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        button?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null);
+          url?: string | null;
+          label?: string | null;
+        };
+        highlighted?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pricing';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1186,9 +1454,15 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         contact?: T | ContactBlockSelect<T>;
+        'cta-band'?: T | CtaBandBlockSelect<T>;
+        'feature-rows'?: T | FeatureRowsBlockSelect<T>;
         features?: T | FeaturesBlockSelect<T>;
+        'hero-centered'?: T | HeroCenteredBlockSelect<T>;
         'hero-split'?: T | HeroSplitBlockSelect<T>;
         'latest-posts'?: T | LatestPostsBlockSelect<T>;
+        'logo-strip'?: T | LogoStripBlockSelect<T>;
+        newsletter?: T | NewsletterBlockSelect<T>;
+        pricing?: T | PricingBlockSelect<T>;
         testimonial?: T | TestimonialBlockSelect<T>;
       };
   meta?:
@@ -1219,6 +1493,42 @@ export interface ContactBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CtaBandBlock_select".
+ */
+export interface CtaBandBlockSelect<T extends boolean = true> {
+  heading?: T;
+  text?: T;
+  button?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FeatureRowsBlock_select".
+ */
+export interface FeatureRowsBlockSelect<T extends boolean = true> {
+  rows?:
+    | T
+    | {
+        title?: T;
+        body?: T;
+        image?: T;
+        reverse?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "FeaturesBlock_select".
  */
 export interface FeaturesBlockSelect<T extends boolean = true> {
@@ -1230,6 +1540,43 @@ export interface FeaturesBlockSelect<T extends boolean = true> {
     | {
         icon?: T;
         title?: T;
+        text?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroCenteredBlock_select".
+ */
+export interface HeroCenteredBlockSelect<T extends boolean = true> {
+  badge?: T;
+  heading?: T;
+  description?: T;
+  primaryButton?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  secondaryButton?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  backgroundImage?: T;
+  bullets?:
+    | T
+    | {
+        icon?: T;
         text?: T;
         id?: T;
       };
@@ -1281,6 +1628,66 @@ export interface LatestPostsBlockSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
         label?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LogoStripBlock_select".
+ */
+export interface LogoStripBlockSelect<T extends boolean = true> {
+  heading?: T;
+  logos?:
+    | T
+    | {
+        image?: T;
+        name?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "NewsletterBlock_select".
+ */
+export interface NewsletterBlockSelect<T extends boolean = true> {
+  heading?: T;
+  text?: T;
+  form?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricingBlock_select".
+ */
+export interface PricingBlockSelect<T extends boolean = true> {
+  heading?: T;
+  plans?:
+    | T
+    | {
+        name?: T;
+        price?: T;
+        period?: T;
+        features?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        button?:
+          | T
+          | {
+              type?: T;
+              newTab?: T;
+              reference?: T;
+              url?: T;
+              label?: T;
+            };
+        highlighted?: T;
+        id?: T;
       };
   id?: T;
   blockName?: T;

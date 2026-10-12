@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=../schema.json
+name: pricing
+label: Pricing
+plural: Pricing tables
+description: Up to three package cards with a price and what is included; tick "highlighted" to make one stand out.
+group: Conversion
+
+fields:
+  heading: text
+  plans:
+    type: array
+    min: 1
+    max: 3
+    rowLabel: name
+    fields:
+      name:
+        type: text
+        required: true
+      price:
+        type: number
+        required: true
+        min: 0
+        help: Price in US dollars, without the currency sign.
+      period:
+        type: select
+        default: month
+        options:
+          - { value: month, label: per month }
+          - { value: year, label: per year }
+      features:
+        type: array
+        max: 8
+        rowLabel: text
+        fields:
+          text:
+            type: text
+            required: true
+      button: link
+      highlighted:
+        type: checkbox
+        default: false
+
+layout:
+  - div: container flex flex-col items-center gap-12 py-20 md:py-28
+    as: section
+    children:
+      - text: heading
+        as: h2
+        variant: heading.section
+        class: text-center
+        if: heading
+      - each: plans
+        as: ul
+        class: grid w-full gap-6 md:grid-cols-3 md:items-stretch
+        children:
+          - div: h-full
+            as: li
+            variant: card.planHighlighted
+            if: { field: highlighted, equals: true }
+            children:
+              - text: name
+                as: h3
+                class: font-heading text-2xl text-primary
+              - div: flex items-baseline gap-1
+                children:
+                  - text: { value: $ }
+                    as: span
+                    class: text-xl
+                  - text: price
+                    as: span
+                    class: font-heading text-5xl tracking-tight
+                  - text: period
+                    as: span
+                    class: pl-1 text-sm text-muted-foreground
+              - each: features
+                as: ul
+                class: flex flex-col gap-3 text-sm
+                children:
+                  - text: text
+                    as: li
+                    class: border-l-2 border-primary pl-3
+              - button: button
+                variant: button.primary
+                class: mt-auto w-full
+                if: button
+          - div: h-full
+            as: li
+            variant: card.plan
+            if: { field: highlighted, not: true }
+            children:
+              - text: name
+                as: h3
+                class: font-heading text-2xl
+              - div: flex items-baseline gap-1
+                children:
+                  - text: { value: $ }
+                    as: span
+                    class: text-xl
+                  - text: price
+                    as: span
+                    class: font-heading text-5xl tracking-tight
+                  - text: period
+                    as: span
+                    class: pl-1 text-sm text-muted-foreground
+              - each: features
+                as: ul
+                class: flex flex-col gap-3 text-sm
+                children:
+                  - text: text
+                    as: li
+                    class: border-l-2 border-border pl-3
+              - button: button
+                variant: button.ghost
+                class: mt-auto w-full
+                if: button

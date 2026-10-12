@@ -48,6 +48,10 @@ variants:
   text:
     lead: text-lg leading-relaxed text-muted-foreground
     eyebrow: text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground
+    badge: inline-flex items-center rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground
+  card:
+    plan: flex flex-col gap-6 rounded-lg border border-border bg-card p-8 text-card-foreground shadow-sm
+    planHighlighted: flex flex-col gap-6 rounded-lg border border-primary bg-card p-8 text-card-foreground shadow-md
   button:
     primary: inline-flex items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90
     ghost: inline-flex items-center justify-center rounded-md border border-border px-5 py-3 text-sm font-medium transition-colors hover:bg-muted

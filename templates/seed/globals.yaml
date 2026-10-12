@@ -3,6 +3,7 @@ header:
   logo: "@media/logo.svg"
   navItems:
     - link: { type: reference, reference: "@page/home", label: Work }
+    - link: { type: reference, reference: "@page/services", label: Services }
     - link: { type: custom, url: /posts, label: Journal }
     - link: { type: reference, reference: "@page/contact", label: Contact }
   cta: { type: reference, reference: "@page/contact", label: Start a project }
@@ -12,6 +13,7 @@ footer:
     - heading: Studio
       links:
         - link: { type: reference, reference: "@page/home", label: Work }
+        - link: { type: reference, reference: "@page/services", label: Services }
         - link: { type: reference, reference: "@page/contact", label: Contact }
     - heading: Journal
       links:
