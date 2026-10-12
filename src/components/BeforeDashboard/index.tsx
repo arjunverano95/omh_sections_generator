@@ -16,7 +16,7 @@ const BeforeDashboard: React.FC = () => {
       <ul className={`${baseClass}__instructions`}>
         <li>
           <SeedButton />
-          {' with a few pages, posts, and projects to jump-start your new site, then '}
+          {': its pages, forms, header and footer, plus a few demo posts. Then '}
           <a href="/" target="_blank">
             visit your website
           </a>

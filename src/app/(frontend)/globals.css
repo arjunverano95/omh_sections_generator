@@ -36,6 +36,8 @@
 @source inline("bg-success/30");
 @source inline("border-warning");
 @source inline("bg-warning/30");
+/* Section layouts name their utilities in YAML, so the templates are a Tailwind source. */
+@source "../../../templates";
 
 @theme {
   --breakpoint-sm: 40rem;
@@ -45,6 +47,8 @@
   --breakpoint-2xl: 86rem;
   --font-mono: var(--font-geist-mono);
   --font-sans: var(--font-geist-sans);
+  /* The active template's theme.css sets both of these on :root. */
+  --font-heading: var(--font-sans);
 }
 
 @layer utilities {

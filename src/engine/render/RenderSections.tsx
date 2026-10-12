@@ -6,7 +6,11 @@ import { plans } from '@/generated/sections/plan'
 import { RenderTree } from './RenderTree'
 import { reportPlanError } from './planError'
 
-type Row = ScopeObject & { blockType: string; id?: string | null }
+/**
+ * What a layout row is to the renderer. Kept to the two known keys (no index signature) so the
+ * generated `Page['layout']` interfaces are assignable; a row still scopes as a ScopeObject.
+ */
+type Row = { blockType: string; id?: string | null }
 
 /** Renders a page's `layout`: each row through the plan compiled for its block type. */
 export function RenderSections({ blocks }: { blocks?: Row[] | null }) {
@@ -21,7 +25,7 @@ export function RenderSections({ blocks }: { blocks?: Row[] | null }) {
 
     return (
       <Fragment key={row.id ?? index}>
-        <RenderTree nodes={plan} scope={[row]} />
+        <RenderTree nodes={plan} scope={[row as ScopeObject]} />
       </Fragment>
     )
   })
