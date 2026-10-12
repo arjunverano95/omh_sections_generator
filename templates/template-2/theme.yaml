@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../../schema.json
+fonts:
+  sans: Space Grotesk
+
+colors:
+  light:
+    background: oklch(98% 0.005 110deg)
+    foreground: oklch(17% 0.01 110deg)
+    card: oklch(100% 0 0deg)
+    card-foreground: oklch(17% 0.01 110deg)
+    primary: oklch(50% 0.16 135deg)
+    primary-foreground: oklch(98% 0.01 110deg)
+    secondary: oklch(93% 0.01 110deg)
+    secondary-foreground: oklch(17% 0.01 110deg)
+    muted: oklch(94% 0.008 110deg)
+    muted-foreground: oklch(45% 0.01 110deg)
+    accent: oklch(93% 0.04 125deg)
+    accent-foreground: oklch(17% 0.01 110deg)
+    border: oklch(88% 0.01 110deg)
+    input: oklch(88% 0.01 110deg)
+    ring: oklch(50% 0.16 135deg)
+  dark:
+    background: oklch(13% 0.005 110deg)
+    foreground: oklch(96% 0.01 100deg)
+    card: oklch(17% 0.006 110deg)
+    card-foreground: oklch(96% 0.01 100deg)
+    primary: oklch(90% 0.21 125deg)
+    primary-foreground: oklch(14% 0.01 110deg)
+    secondary: oklch(22% 0.008 110deg)
+    secondary-foreground: oklch(96% 0.01 100deg)
+    muted: oklch(20% 0.006 110deg)
+    muted-foreground: oklch(70% 0.01 100deg)
+    accent: oklch(25% 0.05 125deg)
+    accent-foreground: oklch(96% 0.01 100deg)
+    border: oklch(27% 0.008 110deg)
+    input: oklch(27% 0.008 110deg)
+    ring: oklch(90% 0.21 125deg)
+
+radius: 0.25rem
+
+variants:
+  heading:
+    hero: font-heading text-5xl font-bold leading-[1.02] tracking-tight md:text-7xl
+    section: font-heading text-3xl font-bold tracking-tight md:text-5xl
+  text:
+    lead: max-w-2xl text-lg text-muted-foreground md:text-xl
+    badge: inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-primary
+  button:
+    primary: inline-flex items-center justify-center rounded-sm bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:opacity-90
+    secondary: inline-flex items-center justify-center rounded-sm border border-border px-6 py-3 font-semibold text-foreground transition hover:border-primary hover:text-primary
+    link: text-sm text-foreground/70 transition hover:text-foreground
+  card:
+    plan: flex flex-col gap-6 rounded-sm border border-border bg-card p-8 text-card-foreground
+    planHighlighted: flex flex-col gap-6 rounded-sm border-2 border-primary bg-card p-8 text-card-foreground shadow-[0_0_40px_-12px] shadow-primary/50 md:-translate-y-3

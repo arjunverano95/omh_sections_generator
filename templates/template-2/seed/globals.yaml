@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=../../schema.json
+header:
+  wordmark: Orbit
+  navItems:
+    - link: { type: reference, reference: "@page/home", label: Product }
+    - link: { type: custom, url: "/posts", label: Changelog }
+    - link: { type: custom, url: "mailto:hello@example.com", label: Contact }
+  secondaryCta: { type: custom, url: "/posts", label: What's new }
+  primaryCta: { type: reference, reference: "@page/home", label: Get started }
+
+footer:
+  copyright: © 2026 Orbit Labs. All rights reserved.
+  links:
+    - link: { type: reference, reference: "@page/home", label: Home }
+    - link: { type: custom, url: "/posts", label: Changelog }
+    - link: { type: custom, url: "mailto:hello@example.com", label: Contact }
+  social:
+    - icon: rss
+      link: { type: custom, url: "/posts", label: Changelog feed }
+    - icon: mail
+      link: { type: custom, url: "mailto:hello@example.com", label: Email us }
+    - icon: globe
+      link: { type: custom, url: "https://example.com", label: Website, newTab: true }

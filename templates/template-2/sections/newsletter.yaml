@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=../../schema.json
+name: newsletter
+label: Newsletter
+description: A compact centred sign-up form.
+group: Conversion
+fields:
+  heading: text
+  text: textarea
+  form:
+    type: form
+    required: true
+
+layout:
+  - div: container flex flex-col items-center gap-4 py-24 text-center
+    as: section
+    children:
+      - text: heading
+        as: h2
+        variant: heading.section
+      - text: text
+        class: max-w-xl text-muted-foreground
+      - form: form
+        class: w-full max-w-md pt-2 text-left
