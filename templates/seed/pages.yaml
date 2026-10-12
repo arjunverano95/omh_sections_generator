@@ -42,6 +42,94 @@
         text: Tell us about the project, the timeline and who you are writing for.
         form: "@form/contact"
 
+- slug: services
+  title: Services
+  meta:
+    title: Services
+    description: Design sprints, monthly retainers and yearly partnerships from Studio.
+  sections:
+    - hero-centered:
+        badge: Services
+        heading: Design by the sprint or by the season.
+        description: We work in fixed-scope sprints for a single project and in monthly retainers for teams that publish every week.
+        bullets:
+          - { icon: calendar, text: "Fixed scope, fixed fee" }
+          - { icon: pen-tool, text: Senior designers only }
+          - { icon: book-open, text: Everything written down }
+        primaryButton: { type: reference, reference: "@page/contact", label: Start a project }
+        secondaryButton: { type: reference, reference: "@page/home", label: See the work }
+        backgroundImage: "@media/services-hero.jpg"
+
+    - logo-strip:
+        heading: Trusted by editors at
+        logos:
+          - { name: Northlight, image: "@media/logo-northlight.jpg" }
+          - { name: Fernhall, image: "@media/logo-fernhall.jpg" }
+          - { name: Ashgrove Press, image: "@media/logo-ashgrove-press.jpg" }
+          - { name: Meridian Quarterly, image: "@media/logo-meridian-quarterly.jpg" }
+          - { name: Kestrel & Vane, image: "@media/logo-kestrel-and-vane.jpg" }
+          - { name: Halden Review, image: "@media/logo-halden-review.jpg" }
+
+    - feature-rows:
+        rows:
+          - title: We start by reading
+            body: |
+              Every project opens with a week of reading: your archive, your analytics and the people who write for you. The **brief** we hand back is short enough to read in one sitting.
+            image: "@media/how-we-work-reading.jpg"
+            reverse: false
+          - title: We design in the browser
+            body: |
+              Layouts become working pages from the second week, so your editors test real articles on real screens long before go-live.
+            image: "@media/how-we-work-browser.jpg"
+            reverse: true
+          - title: We hand over the keys
+            body: |
+              Go-live comes with a style guide, a walkthrough of the CMS and a month of support. After that the site is yours to run.
+            image: "@media/how-we-work-handover.jpg"
+            reverse: false
+
+    - pricing:
+        heading: Ways to work with us
+        plans:
+          - name: Sprint
+            price: 4800
+            period: month
+            features:
+              - { text: One focused deliverable }
+              - { text: Four weeks from brief to go-live }
+              - { text: Two rounds of revisions }
+            button: { type: reference, reference: "@page/contact", label: Book a sprint }
+            highlighted: false
+          - name: Retainer
+            price: 3200
+            period: month
+            features:
+              - { text: A senior designer two days a week }
+              - { text: A monthly editorial review }
+              - { text: Design system upkeep }
+              - { text: Priority turnaround }
+            button: { type: reference, reference: "@page/contact", label: Start a retainer }
+            highlighted: true
+          - name: Partner
+            price: 36000
+            period: year
+            features:
+              - { text: Everything in Retainer }
+              - { text: One section redesigned each quarter }
+              - { text: A yearly brand review }
+            button: { type: reference, reference: "@page/contact", label: Talk to us }
+            highlighted: false
+
+    - cta-band:
+        heading: Not sure which fits?
+        text: Tell us what you publish and how often. We will suggest a package in one reply.
+        button: { type: reference, reference: "@page/contact", label: Start a project }
+
+    - newsletter:
+        heading: Notes from the studio
+        text: One letter a month on type, layout and the work behind it. Unsubscribe in one click.
+        form: "@form/newsletter"
+
 - slug: about
   title: About
   meta:

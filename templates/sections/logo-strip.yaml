@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=../schema.json
+name: logo-strip
+label: Logo strip
+description: A short heading over one line of greyscale client logos.
+group: Social proof
+
+fields:
+  heading: text
+  logos:
+    type: array
+    min: 1
+    max: 8
+    rowLabel: name
+    fields:
+      image:
+        type: image
+        required: true
+      name:
+        type: text
+        required: true
+        help: The client's name; labels the row in the admin and is read out to screen readers.
+
+layout:
+  - div: container flex flex-col items-center gap-8 py-16
+    as: section
+    children:
+      - text: heading
+        as: h2
+        variant: text.eyebrow
+        if: heading
+      - each: logos
+        as: ul
+        class: flex flex-wrap items-center justify-center gap-x-12 gap-y-6
+        children:
+          - div: flex items-center
+            as: li
+            children:
+              - image: image
+                class: h-12 w-auto rounded-md opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0
+                sizes: 160px
+              - text: name
+                as: span
+                class: sr-only

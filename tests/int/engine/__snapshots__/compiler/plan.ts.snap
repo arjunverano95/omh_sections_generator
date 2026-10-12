@@ -58,6 +58,73 @@ export const plans: Plans = {
       className: 'container grid gap-12 py-20 md:grid-cols-2',
     },
   ],
+  'cta-band': [
+    {
+      type: 'div',
+      as: 'section',
+      children: [
+        {
+          type: 'div',
+          as: 'div',
+          children: [
+            {
+              type: 'div',
+              as: 'div',
+              children: [
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'heading',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'h2',
+                  className: 'font-heading text-3xl tracking-tight md:text-4xl',
+                },
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'text',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'p',
+                  className: 'text-lg text-primary-foreground/80',
+                  if: {
+                    path: [
+                      'text',
+                    ],
+                    depth: 0,
+                  },
+                },
+              ],
+              className: 'flex max-w-2xl flex-col gap-3',
+            },
+            {
+              type: 'button',
+              source: {
+                path: [
+                  'button',
+                ],
+                depth: 0,
+              },
+              className: 'inline-flex shrink-0 items-center justify-center rounded-md bg-primary-foreground px-5 py-3 text-sm font-medium text-primary transition-opacity hover:opacity-90',
+              if: {
+                path: [
+                  'button',
+                ],
+                depth: 0,
+              },
+            },
+          ],
+          className: 'container flex flex-col items-start gap-6 py-16 md:flex-row md:items-center md:justify-between',
+        },
+      ],
+      className: 'bg-primary text-primary-foreground',
+    },
+  ],
   faq: [
     {
       type: 'div',
@@ -147,6 +214,134 @@ export const plans: Plans = {
         },
       ],
       className: 'container grid gap-12 py-20 md:grid-cols-[1fr_2fr]',
+    },
+  ],
+  'feature-rows': [
+    {
+      type: 'each',
+      source: {
+        path: [
+          'rows',
+        ],
+        depth: 0,
+      },
+      as: 'section',
+      children: [
+        {
+          type: 'div',
+          as: 'article',
+          children: [
+            {
+              type: 'div',
+              as: 'div',
+              children: [
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'title',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'h2',
+                  className: 'font-heading text-3xl tracking-tight md:text-4xl',
+                },
+                {
+                  type: 'richText',
+                  source: {
+                    path: [
+                      'body',
+                    ],
+                    depth: 0,
+                  },
+                  className: 'text-lg leading-relaxed text-muted-foreground',
+                },
+              ],
+              className: 'flex flex-col gap-4',
+            },
+            {
+              type: 'image',
+              source: {
+                path: [
+                  'image',
+                ],
+                depth: 0,
+              },
+              sizes: '(min-width: 768px) 50vw, 100vw',
+              className: 'aspect-[4/3] w-full rounded-lg object-cover',
+            },
+          ],
+          className: 'grid items-center gap-10 md:grid-cols-2 md:gap-16',
+          if: {
+            path: [
+              'reverse',
+            ],
+            depth: 0,
+            not: true,
+          },
+        },
+        {
+          type: 'div',
+          as: 'article',
+          children: [
+            {
+              type: 'div',
+              as: 'div',
+              children: [
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'title',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'h2',
+                  className: 'font-heading text-3xl tracking-tight md:text-4xl',
+                },
+                {
+                  type: 'richText',
+                  source: {
+                    path: [
+                      'body',
+                    ],
+                    depth: 0,
+                  },
+                  className: 'text-lg leading-relaxed text-muted-foreground',
+                },
+              ],
+              className: 'flex flex-col gap-4',
+            },
+            {
+              type: 'div',
+              as: 'div',
+              children: [
+                {
+                  type: 'image',
+                  source: {
+                    path: [
+                      'image',
+                    ],
+                    depth: 0,
+                  },
+                  sizes: '(min-width: 768px) 50vw, 100vw',
+                  className: 'aspect-[4/3] w-full rounded-lg object-cover',
+                },
+              ],
+              className: 'md:order-first',
+            },
+          ],
+          className: 'grid items-center gap-10 md:grid-cols-2 md:gap-16',
+          if: {
+            path: [
+              'reverse',
+            ],
+            depth: 0,
+            equals: true,
+          },
+        },
+      ],
+      className: 'container flex flex-col gap-20 py-20 md:gap-24 md:py-28',
     },
   ],
   features: [
@@ -371,6 +566,163 @@ export const plans: Plans = {
         },
       ],
       className: 'container flex flex-col gap-12 py-20',
+    },
+  ],
+  'hero-centered': [
+    {
+      type: 'div',
+      as: 'section',
+      children: [
+        {
+          type: 'image',
+          source: {
+            path: [
+              'backgroundImage',
+            ],
+            depth: 0,
+          },
+          priority: true,
+          className: 'absolute inset-0 h-full w-full object-cover opacity-20',
+          if: {
+            path: [
+              'backgroundImage',
+            ],
+            depth: 0,
+          },
+        },
+        {
+          type: 'div',
+          as: 'div',
+          children: [
+            {
+              type: 'text',
+              source: {
+                path: [
+                  'badge',
+                ],
+                depth: 0,
+              },
+              as: 'span',
+              className: 'inline-flex items-center rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground',
+              if: {
+                path: [
+                  'badge',
+                ],
+                depth: 0,
+              },
+            },
+            {
+              type: 'text',
+              source: {
+                path: [
+                  'heading',
+                ],
+                depth: 0,
+              },
+              as: 'h1',
+              className: 'font-heading text-5xl leading-[1.05] tracking-tight md:text-6xl max-w-4xl',
+            },
+            {
+              type: 'text',
+              source: {
+                path: [
+                  'description',
+                ],
+                depth: 0,
+              },
+              as: 'p',
+              className: 'text-lg leading-relaxed text-muted-foreground max-w-2xl',
+              if: {
+                path: [
+                  'description',
+                ],
+                depth: 0,
+              },
+            },
+            {
+              type: 'each',
+              source: {
+                path: [
+                  'bullets',
+                ],
+                depth: 0,
+              },
+              as: 'ul',
+              children: [
+                {
+                  type: 'div',
+                  as: 'li',
+                  children: [
+                    {
+                      type: 'icon',
+                      source: {
+                        path: [
+                          'icon',
+                        ],
+                        depth: 0,
+                      },
+                      className: 'text-primary',
+                    },
+                    {
+                      type: 'text',
+                      source: {
+                        path: [
+                          'text',
+                        ],
+                        depth: 0,
+                      },
+                      as: 'span',
+                    },
+                  ],
+                  className: 'flex items-center gap-2',
+                },
+              ],
+              className: 'flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm',
+            },
+            {
+              type: 'div',
+              as: 'div',
+              children: [
+                {
+                  type: 'button',
+                  source: {
+                    path: [
+                      'primaryButton',
+                    ],
+                    depth: 0,
+                  },
+                  className: 'inline-flex items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90',
+                  if: {
+                    path: [
+                      'primaryButton',
+                    ],
+                    depth: 0,
+                  },
+                },
+                {
+                  type: 'button',
+                  source: {
+                    path: [
+                      'secondaryButton',
+                    ],
+                    depth: 0,
+                  },
+                  className: 'inline-flex items-center justify-center rounded-md border border-border px-5 py-3 text-sm font-medium transition-colors hover:bg-muted',
+                  if: {
+                    path: [
+                      'secondaryButton',
+                    ],
+                    depth: 0,
+                  },
+                },
+              ],
+              className: 'flex flex-wrap justify-center gap-3 pt-2',
+            },
+          ],
+          className: 'container relative flex flex-col items-center gap-6 py-20 text-center md:py-28',
+        },
+      ],
+      className: 'relative flex min-h-[70vh] items-center overflow-hidden',
     },
   ],
   'hero-cover': [
@@ -777,6 +1129,378 @@ export const plans: Plans = {
         },
       ],
       className: 'container flex flex-col gap-10 py-20',
+    },
+  ],
+  'logo-strip': [
+    {
+      type: 'div',
+      as: 'section',
+      children: [
+        {
+          type: 'text',
+          source: {
+            path: [
+              'heading',
+            ],
+            depth: 0,
+          },
+          as: 'h2',
+          className: 'text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground',
+          if: {
+            path: [
+              'heading',
+            ],
+            depth: 0,
+          },
+        },
+        {
+          type: 'each',
+          source: {
+            path: [
+              'logos',
+            ],
+            depth: 0,
+          },
+          as: 'ul',
+          children: [
+            {
+              type: 'div',
+              as: 'li',
+              children: [
+                {
+                  type: 'image',
+                  source: {
+                    path: [
+                      'image',
+                    ],
+                    depth: 0,
+                  },
+                  sizes: '160px',
+                  className: 'h-12 w-auto rounded-md opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0',
+                },
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'name',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'span',
+                  className: 'sr-only',
+                },
+              ],
+              className: 'flex items-center',
+            },
+          ],
+          className: 'flex flex-wrap items-center justify-center gap-x-12 gap-y-6',
+        },
+      ],
+      className: 'container flex flex-col items-center gap-8 py-16',
+    },
+  ],
+  newsletter: [
+    {
+      type: 'div',
+      as: 'section',
+      children: [
+        {
+          type: 'text',
+          source: {
+            path: [
+              'heading',
+            ],
+            depth: 0,
+          },
+          as: 'h2',
+          className: 'font-heading text-3xl tracking-tight md:text-4xl',
+          if: {
+            path: [
+              'heading',
+            ],
+            depth: 0,
+          },
+        },
+        {
+          type: 'text',
+          source: {
+            path: [
+              'text',
+            ],
+            depth: 0,
+          },
+          as: 'p',
+          className: 'text-lg leading-relaxed text-muted-foreground max-w-xl',
+          if: {
+            path: [
+              'text',
+            ],
+            depth: 0,
+          },
+        },
+        {
+          type: 'form',
+          source: {
+            path: [
+              'form',
+            ],
+            depth: 0,
+          },
+          className: 'w-full max-w-md pt-2 text-left',
+        },
+      ],
+      className: 'container flex flex-col items-center gap-4 py-20 text-center md:py-28',
+    },
+  ],
+  pricing: [
+    {
+      type: 'div',
+      as: 'section',
+      children: [
+        {
+          type: 'text',
+          source: {
+            path: [
+              'heading',
+            ],
+            depth: 0,
+          },
+          as: 'h2',
+          className: 'font-heading text-3xl tracking-tight md:text-4xl text-center',
+          if: {
+            path: [
+              'heading',
+            ],
+            depth: 0,
+          },
+        },
+        {
+          type: 'each',
+          source: {
+            path: [
+              'plans',
+            ],
+            depth: 0,
+          },
+          as: 'ul',
+          children: [
+            {
+              type: 'div',
+              as: 'li',
+              children: [
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'name',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'h3',
+                  className: 'font-heading text-2xl text-primary',
+                },
+                {
+                  type: 'div',
+                  as: 'div',
+                  children: [
+                    {
+                      type: 'text',
+                      source: {
+                        value: '$',
+                      },
+                      as: 'span',
+                      className: 'text-xl',
+                    },
+                    {
+                      type: 'text',
+                      source: {
+                        path: [
+                          'price',
+                        ],
+                        depth: 0,
+                      },
+                      as: 'span',
+                      className: 'font-heading text-5xl tracking-tight',
+                    },
+                    {
+                      type: 'text',
+                      source: {
+                        path: [
+                          'period',
+                        ],
+                        depth: 0,
+                      },
+                      as: 'span',
+                      labels: {
+                        month: 'per month',
+                        year: 'per year',
+                      },
+                      className: 'pl-1 text-sm text-muted-foreground',
+                    },
+                  ],
+                  className: 'flex items-baseline gap-1',
+                },
+                {
+                  type: 'each',
+                  source: {
+                    path: [
+                      'features',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'ul',
+                  children: [
+                    {
+                      type: 'text',
+                      source: {
+                        path: [
+                          'text',
+                        ],
+                        depth: 0,
+                      },
+                      as: 'li',
+                      className: 'border-l-2 border-primary pl-3',
+                    },
+                  ],
+                  className: 'flex flex-col gap-3 text-sm',
+                },
+                {
+                  type: 'button',
+                  source: {
+                    path: [
+                      'button',
+                    ],
+                    depth: 0,
+                  },
+                  className: 'inline-flex items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 mt-auto w-full',
+                  if: {
+                    path: [
+                      'button',
+                    ],
+                    depth: 0,
+                  },
+                },
+              ],
+              className: 'flex flex-col gap-6 rounded-lg border border-primary bg-card p-8 text-card-foreground shadow-md h-full',
+              if: {
+                path: [
+                  'highlighted',
+                ],
+                depth: 0,
+                equals: true,
+              },
+            },
+            {
+              type: 'div',
+              as: 'li',
+              children: [
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'name',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'h3',
+                  className: 'font-heading text-2xl',
+                },
+                {
+                  type: 'div',
+                  as: 'div',
+                  children: [
+                    {
+                      type: 'text',
+                      source: {
+                        value: '$',
+                      },
+                      as: 'span',
+                      className: 'text-xl',
+                    },
+                    {
+                      type: 'text',
+                      source: {
+                        path: [
+                          'price',
+                        ],
+                        depth: 0,
+                      },
+                      as: 'span',
+                      className: 'font-heading text-5xl tracking-tight',
+                    },
+                    {
+                      type: 'text',
+                      source: {
+                        path: [
+                          'period',
+                        ],
+                        depth: 0,
+                      },
+                      as: 'span',
+                      labels: {
+                        month: 'per month',
+                        year: 'per year',
+                      },
+                      className: 'pl-1 text-sm text-muted-foreground',
+                    },
+                  ],
+                  className: 'flex items-baseline gap-1',
+                },
+                {
+                  type: 'each',
+                  source: {
+                    path: [
+                      'features',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'ul',
+                  children: [
+                    {
+                      type: 'text',
+                      source: {
+                        path: [
+                          'text',
+                        ],
+                        depth: 0,
+                      },
+                      as: 'li',
+                      className: 'border-l-2 border-border pl-3',
+                    },
+                  ],
+                  className: 'flex flex-col gap-3 text-sm',
+                },
+                {
+                  type: 'button',
+                  source: {
+                    path: [
+                      'button',
+                    ],
+                    depth: 0,
+                  },
+                  className: 'inline-flex items-center justify-center rounded-md border border-border px-5 py-3 text-sm font-medium transition-colors hover:bg-muted mt-auto w-full',
+                  if: {
+                    path: [
+                      'button',
+                    ],
+                    depth: 0,
+                  },
+                },
+              ],
+              className: 'flex flex-col gap-6 rounded-lg border border-border bg-card p-8 text-card-foreground shadow-sm h-full',
+              if: {
+                path: [
+                  'highlighted',
+                ],
+                depth: 0,
+                not: true,
+              },
+            },
+          ],
+          className: 'grid w-full gap-6 md:grid-cols-3 md:items-stretch',
+        },
+      ],
+      className: 'container flex flex-col items-center gap-12 py-20 md:py-28',
     },
   ],
   stats: [

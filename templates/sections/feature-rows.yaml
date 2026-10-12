@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../schema.json
+name: feature-rows
+label: Feature rows
+description: Alternating rows of copy and image; tick "reverse" to put the image on the left on wider screens.
+group: Content
+
+fields:
+  rows:
+    type: array
+    min: 1
+    max: 6
+    rowLabel: title
+    fields:
+      title:
+        type: text
+        required: true
+      body: richText
+      image:
+        type: image
+        required: true
+      reverse:
+        type: checkbox
+        default: false
+        help: Put the image on the left.
+
+layout:
+  - each: rows
+    as: section
+    class: container flex flex-col gap-20 py-20 md:gap-24 md:py-28
+    children:
+      - div: grid items-center gap-10 md:grid-cols-2 md:gap-16
+        as: article
+        if: { field: reverse, not: true }
+        children:
+          - div: flex flex-col gap-4
+            children:
+              - text: title
+                as: h2
+                variant: heading.section
+              - richText: body
+                class: text-lg leading-relaxed text-muted-foreground
+          - image: image
+            class: aspect-[4/3] w-full rounded-lg object-cover
+            sizes: "(min-width: 768px) 50vw, 100vw"
+      - div: grid items-center gap-10 md:grid-cols-2 md:gap-16
+        as: article
+        if: { field: reverse, equals: true }
+        children:
+          - div: flex flex-col gap-4
+            children:
+              - text: title
+                as: h2
+                variant: heading.section
+              - richText: body
+                class: text-lg leading-relaxed text-muted-foreground
+          - div: md:order-first
+            children:
+              - image: image
+                class: aspect-[4/3] w-full rounded-lg object-cover
+                sizes: "(min-width: 768px) 50vw, 100vw"
