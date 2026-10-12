@@ -63,7 +63,7 @@ pnpm sections:check                         # --check --strict
 
 `generate:types` runs after every compile because the generated blocks change `src/payload-types.ts`.
 
-A run prints one report line: `5 sections and 2 globals compiled, 7 files written` after a compile, `ok` after a passing check, or `failed (1 error)` with the diagnostics above it. An unknown option is refused with the usage text.
+A run prints one report line: `16 sections and 2 globals compiled, 7 files written` after a compile, `ok` after a passing check, or `failed (1 error)` with the diagnostics above it. An unknown option is refused with the usage text.
 
 ## 4. Generated files
 

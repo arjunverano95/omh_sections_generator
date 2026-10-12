@@ -136,16 +136,17 @@ Six phases. Each ends in a state that runs and is committed on its own. Phase 2 
 - [x] Phase 0: dependencies pinned, Dockerfile base set, stock template runs, baseline checks pass
 - [x] Phase 1: schemas, compiler, CLI, `templates/` compiles, broken-fixture suite, output snapshot, `schema.json`
 - [x] Phase 2: renderer, seven primitives, Payload helpers, Pages on generated blocks, a generated hero editable and live-previewed
-- [ ] Phase 3: theme.css, fonts.ts, generated globals, `siteName`, Form and List primitives, the sixteen sections, the four-page seed
+- [x] Phase 3: theme.css, fonts.ts, generated globals, `siteName` and `colorMode`, Form and List primitives, the sixteen sections, the four-page seed
 - [x] Phase 4: stock blocks, heroes, header, footer and seed documents removed
-- [ ] Phase 5: e2e suite, root README, spec reconciled with the code
+- [x] Phase 5: e2e suite, root README, spec reconciled with the code
 
 ## Verification Checklist
 
 - [x] `pnpm sections:check` passes with `--strict`
-- [ ] `pnpm test:int` passes: compiler fixtures, snapshots, renderer, seeder
+- [x] `pnpm test:int` passes: 91 tests in 5 files (compiler fixtures, snapshots, renderer, seeder)
+- [x] `pnpm test:e2e` passes: 7 tests in 3 files. Sections (3): seed, the home hero heading, the header and footer, a contact form submission. Admin Panel (3). Frontend (1): a post page
 - [ ] `pnpm lint`, `tsc --noEmit` and `pnpm build` pass
-- [ ] Seed, every seeded page renders, both forms submit and the submissions are in the admin (the `Sections` e2e suite); every section lists in the admin's add-block drawer under its group with its label and fields; Live Preview renders the page beside the form
+- [ ] Every seeded page renders and both forms' submissions are in the admin; every section lists in the admin's add-block drawer under its group with its label and fields; Live Preview renders the page beside the form
 - [ ] R8 acceptance: a section added under `templates/sections/` compiles, appears in the admin's drawer under its group, and `git status` shows nothing under `src/`
 - [ ] R9 lean output: compiler test "list select derivation"; the renderer tests for empty values rendering nothing; a generated block declares only the section's fields (the compiler snapshots)
 - [x] No attribution trailers in any commit message
@@ -160,10 +161,12 @@ Six phases. Each ends in a state that runs and is committed on its own. Phase 2 
 - **Lexical is bundled once per Next server layer.** `getPayload` caches one instance for every layer, so a route handler that converts Markdown with editors taken from `payload.config` fails with "is not a constructor that subclasses LexicalNode" once the admin layer has initialised. The seeder builds its converter from the `config` its caller imports (`editorConfigFactory.fromField`), and the seed route passes its own. Any new server-side Lexical conversion needs the same care.
 - **Media files on reseed.** The seeder clears collections through the database adapter, so the documents go but the files under `public/media/` stay, and the next seed uploads them again with `-1`, `-2` suffixes, as the stock seed does. Harmless locally; a deployment that reseeds would clear the folder first.
 - **Playwright and the tsx loader.** `test:e2e` runs Playwright under `--import=tsx/esm`, which conflicts with Playwright 1.63's own TypeScript ESM loader, so the script also sets `PW_DISABLE_TS_ESM=1`.
+- **The e2e web server's own Node options.** Playwright starts the site with `pnpm build && pnpm start` and gives that command `NODE_OPTIONS=--no-deprecation` alone. pnpm 11 fails under `--import=tsx/esm` before the build starts (it reports a missing `.pnpmfile.mjs`), so the loader the test runner needs must not reach the web server; with it, the suite runs only against a site that is already up.
+- **The Sections suite runs first and alone.** `tests/e2e/sections.e2e.spec.ts` is its own Playwright project, `sections`, and the `chromium` project (Admin Panel and Frontend) depends on it. Seeding clears the content collections and the suite signs in as the shared test user, so it cannot run beside the other suites.
 - **Browser binary for e2e.** Playwright 1.63 wants Chromium build 1243. On a network where `playwright install chromium` times out against the Playwright CDN, the same archive from a public mirror, unpacked into Playwright's browsers folder, works.
 - **`AGENTS.md`.** `next dev` on Next 16 appends a `nextjs-agent-rules` block to `AGENTS.md`. It is committed as Next writes it; `agentRules: false` in `next.config.ts` turns the behaviour off.
 - **Seed types shim.** `src/engine/seed/types.ts` only re-exports the seed schema's inferred types under the seeder's names. Callers could import from `src/engine/schema/seed.ts` directly and the file could go.
 
 ## Current Status
 
-Phases 0 to 2 and 4 are done; phase 3 completes with the remaining sections of the library and the Services and About pages; phase 5 is the end-to-end suite, the root README and this reconciliation. Of the open issues, list revalidation and mobile navigation are the two a real site would want first.
+Phases 0 to 5 are done: the Studio site compiles from `templates/` alone, with sixteen sections seeded into Home, Services, About and Contact. The integration suite (91 tests) and the end-to-end suite (7 tests) pass. Of the open issues, list revalidation and mobile navigation are the two a real site would want first.
