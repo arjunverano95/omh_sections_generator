@@ -7,7 +7,7 @@
  */
 import { access } from 'node:fs/promises'
 import path from 'node:path'
-import type { Payload, PayloadRequest, RequiredDataFromCollectionSlug } from 'payload'
+import type { Payload, PayloadRequest, RequiredDataFromCollectionSlug, SanitizedConfig } from 'payload'
 
 import type { GlobalName, Manifest } from '@/engine/manifest'
 
@@ -29,6 +29,11 @@ export type SeedTemplateArgs = {
   manifest: Manifest
   /** Folder holding posts.yaml, media.yaml and media/. Defaults to src/engine/seed. */
   postsDir?: string
+  /**
+   * The sanitized config the calling module imported (`await` of `@payload-config`). Inside
+   * Next.js this must be passed: see createMarkdownConverter. Defaults to `payload.config`.
+   */
+  config?: SanitizedConfig
 }
 
 export type SeedSummary = {
@@ -205,9 +210,9 @@ function safeParse(value: unknown) {
   }
 }
 
-export async function seedTemplate({ payload, req, templateDir, manifest, postsDir }: SeedTemplateArgs): Promise<SeedSummary> {
+export async function seedTemplate({ payload, req, templateDir, manifest, postsDir, config }: SeedTemplateArgs): Promise<SeedSummary> {
   const plan = await planSeed(templateDir, manifest, postsDir)
-  const toLexical = createMarkdownConverter(payload)
+  const toLexical = createMarkdownConverter(config ?? payload.config)
 
   payload.logger.info(`— Seeding ${manifest.label} (${manifest.name})...`)
 

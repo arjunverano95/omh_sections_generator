@@ -21,7 +21,8 @@ export async function POST(): Promise<Response> {
     // At this point you should pass in a user, locale, and any other context you need for the Local API
     const payloadReq = await createPayloadRequest({ payload, user })
 
-    await seed({ payload, req: payloadReq })
+    // This module's own config, not payload.config: see createMarkdownConverter.
+    await seed({ payload, req: payloadReq, config: await config })
 
     return Response.json({ success: true })
   } catch (e) {

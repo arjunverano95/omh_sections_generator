@@ -1,4 +1,5 @@
-import type { CollectionSlug, Payload, PayloadRequest } from 'payload'
+import type { CollectionSlug, Payload, PayloadRequest, SanitizedConfig } from 'payload'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import path from 'node:path'
 
 import { seedTemplate } from '@/engine/seed'
@@ -21,8 +22,19 @@ const collections: CollectionSlug[] = [
  *
  * Next.js revalidation errors are normal when seeding without a server running; the seeder
  * writes with `disableRevalidate` and the stock hooks skip revalidation in that case.
+ *
+ * `config` is the caller's own awaited `@payload-config` import, which the seeder's Markdown
+ * conversion needs inside Next.js (see createMarkdownConverter).
  */
-export const seed = async ({ payload, req }: { payload: Payload; req: PayloadRequest }): Promise<void> => {
+export const seed = async ({
+  payload,
+  req,
+  config,
+}: {
+  payload: Payload
+  req: PayloadRequest
+  config?: SanitizedConfig
+}): Promise<void> => {
   payload.logger.info(`Seeding database with ${manifest.label} (${manifest.name})...`)
 
   payload.logger.info(`— Clearing collections...`)
@@ -37,12 +49,20 @@ export const seed = async ({ payload, req }: { payload: Payload; req: PayloadReq
       .map((collection) => payload.db.deleteVersions({ collection, req, where: {} })),
   )
 
-  await seedTemplate({
+  const summary = await seedTemplate({
     payload,
     req,
+    config,
     templateDir: path.resolve(process.cwd(), 'templates', manifest.name),
     manifest,
   })
+
+  // The seeder writes without revalidation. This runs inside a Next.js request, so drop what
+  // the seed replaced: the cached globals (the hooks' tags), the sitemaps and every rendered page.
+  for (const slug of summary.globals) revalidateTag(`global_${slug}`, 'max')
+  revalidateTag('pages-sitemap', 'max')
+  revalidateTag('posts-sitemap', 'max')
+  revalidatePath('/', 'layout')
 
   payload.logger.info('Seeded database successfully!')
 }
