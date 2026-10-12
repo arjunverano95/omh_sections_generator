@@ -16,7 +16,7 @@ Everything under `templates/` is YAML and media. Zero `.ts` or `.tsx` files.
 
 ## 2. Studio
 
-**Theme.** `siteName: Studio`. `Inter` for text, `Playfair Display` for headings. Warm white background, near-black ink, deep blue primary, a soft `0.5rem` radius. A dark set is provided so the theme selector works. Variants: `heading.display`, `heading.section`, `text.lead`, `text.eyebrow`, `text.badge` (a rounded pill), `card.plan` and `card.planHighlighted` (rounded cards with a soft shadow, the highlighted one with a primary border), `button.primary`, `button.ghost`, `button.link`.
+**Theme.** `siteName: Studio`. `Inter` for text, `Playfair Display` for headings. Warm white background, near-black ink, deep blue primary, a soft `0.5rem` radius. `colorMode: light`, so every visitor sees the light palette; the dark set it also declares is what `dark` or `system` would use. Variants: `heading.display`, `heading.section`, `text.lead`, `text.eyebrow`, `text.badge` (a rounded pill), `card.plan` and `card.planHighlighted` (rounded cards with a soft shadow, the highlighted one with a primary border), `button.primary`, `button.ghost`, `button.link`.
 
 **Header.** `logo` (image, required), `navItems` (array of `link`, max 6, rowLabel `link`), `cta` (link, optional, `if: cta`).
 
@@ -146,5 +146,5 @@ Set against the brief's flat list: fields and layout are two explicit halves; ne
 ## 5. What the site does not try to show
 
 - A blog layout. Posts keep the stock post page; the sections link to them.
-- Arrays nested deeper than one level inside a row (the format rejects them), animations, or client-side interaction other than the forms, the FAQ disclosures and the theme selector.
+- Arrays nested deeper than one level inside a row (the format rejects them), animations, or client-side interaction other than the forms and the FAQ disclosures.
 - A mobile menu. The header hides the nav below `md` and relies on the footer; see the open issues in [build-plan.md](build-plan.md#open-issues).

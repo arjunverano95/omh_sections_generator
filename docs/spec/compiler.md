@@ -82,11 +82,12 @@ where `<what>` is "what the site is made of" (`manifest.ts`), "one Payload block
 
 ### `manifest.ts`
 
-What the site is made of, in a shape the seeder, the admin and tests can read without parsing YAML again. The type is `Manifest` in `src/engine/manifest.ts`.
+What the site is made of, in a shape the seeder, the admin, the frontend and tests can read without parsing YAML again: `{ siteName, colorMode, blocks, globals, sections, globalMeta }`. `colorMode` is the theme's value, `system` when the theme sets none; the frontend's theme script reads it from here. The type is `Manifest` in `src/engine/manifest.ts`.
 
 ```ts
 export const manifest: Manifest = {
   siteName: 'Studio',
+  colorMode: 'light',
   blocks: ['contact', 'features', 'hero-split', 'latest-posts', 'testimonial' /* ... */],
   globals: ['header', 'footer'],
   sections: {

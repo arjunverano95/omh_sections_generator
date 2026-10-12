@@ -43,6 +43,7 @@ The compiler reads `templates/` by path; there is no manifest. Three files are r
 
 ```yaml
 siteName: Studio                    # required
+colorMode: light                    # light, dark or system; defaults to system
 
 fonts:
   sans: Inter                       # Google Fonts family name
@@ -78,9 +79,11 @@ variants:                           # named class presets
 
 **Site name.** `siteName` is a string and is required. It is the title suffix in page metadata, the Open Graph site name and the label of the admin's seed button.
 
+**Colour mode.** `colorMode` is `light`, `dark` or `system`, and is optional; without it the mode is `system`. `light` and `dark` render the site in that palette for every visitor. `system` follows the visitor's device setting. The mode is the theme's alone: there is no admin setting and no visitor switch. Any other value is an error: `colorMode is light, dark or system`.
+
 **Fonts.** A value is a Google Fonts family name as shown on fonts.google.com, or a map `{ family, weights: [400, 700], subsets: [latin] }`. `sans` is required; `heading` defaults to `sans`. The compiler turns these into `next/font/google` loaders ([compiler.md section 4](compiler.md#4-generated-files)), which is why the names must be literal: `next/font` is resolved at build time and cannot take a variable.
 
-**Colours.** Token names are the slots the stock stylesheet already defines: `background`, `foreground`, `card`, `card-foreground`, `popover`, `popover-foreground`, `primary`, `primary-foreground`, `secondary`, `secondary-foreground`, `muted`, `muted-foreground`, `accent`, `accent-foreground`, `destructive`, `destructive-foreground`, `border`, `input`, `ring`, `success`, `warning`, `error`. `light` must set at least `background`, `foreground`, `primary` and `primary-foreground`; every other slot falls back to the stock value. `dark` is optional and falls back slot by slot to the stock dark set. Any CSS colour syntax is accepted; `oklch()` is what the stock stylesheet uses.
+**Colours.** Token names are the slots the stock stylesheet already defines: `background`, `foreground`, `card`, `card-foreground`, `popover`, `popover-foreground`, `primary`, `primary-foreground`, `secondary`, `secondary-foreground`, `muted`, `muted-foreground`, `accent`, `accent-foreground`, `destructive`, `destructive-foreground`, `border`, `input`, `ring`, `success`, `warning`, `error`. `light` must set at least `background`, `foreground`, `primary` and `primary-foreground`; every other slot falls back to the stock value. `dark` is optional and falls back slot by slot to the stock dark set; it is the palette a `dark` site uses, and a `system` site uses on a device set to dark. Any CSS colour syntax is accepted; `oklch()` is what the stock stylesheet uses.
 
 **Radius.** A CSS length. It feeds the `rounded-*` scale through the existing `--radius` variable.
 
@@ -390,7 +393,7 @@ The compiler rejects the templates folder when any of these fails. Every message
 8. `as` is in the allowed list for that primitive. `div`, `each` and `list` have `children`; `button` may; no other node does. A literal button without `children` has a `label`.
 9. `if` names a field in scope; `equals`/`not` values match the field's type.
 10. `list.collection` is allowed, `limit` is 1 to 50, `sort` names a field of that collection, `where` placeholders name section fields.
-11. Theme: `siteName` set; `fonts.sans` set; colour tokens are from the slot list; `light` has the four required tokens; `radius` is a CSS length.
+11. Theme: `siteName` set; `colorMode`, when set, is `light`, `dark` or `system`; `fonts.sans` set; colour tokens are from the slot list; `light` has the four required tokens; `radius` is a CSS length.
 12. Arrays nest at most one level.
 
 Warnings, which `--strict` turns into errors: a declared field never referenced in `layout`; a variant never referenced by any file; an `each` without `as` whose children are not `li` nodes inside a `ul`/`ol` (an accessibility hint, not a rule).

@@ -67,7 +67,7 @@ The renderer never reads the theme. Variants were merged into `className` at com
 - `src/app/(frontend)/layout.tsx` imports `@/generated/sections/theme.css` after `./globals.css`, and adds `fontVariables` from `@/generated/sections/fonts` to the `<html>` class list in place of the Geist Sans variable (Geist Mono stays).
 - `globals.css` declares the slot `--font-heading: var(--font-sans)` inside `@theme` so the `font-heading` utility always exists; `theme.css` sets its value.
 
-Dark mode continues to work through the existing `[data-theme='dark']` variant and theme selector; `theme.css` overrides the tokens under the same selector.
+The palette comes from the theme's `colorMode`, which the frontend's theme script reads from the generated manifest: `light` and `dark` set that palette for every visitor, `system` follows the device setting. Dark styling works through the existing `[data-theme='dark']` variant; `theme.css` overrides the tokens under the same selector. There is no visitor switch.
 
 ## 7. Server and client
 

@@ -82,6 +82,10 @@ import { RenderGlobal } from '@/engine/render/RenderGlobal'
 
 The theme's `siteName` comes through the generated manifest. It is the title suffix in `src/plugins/index.ts` (the SEO plugin), `src/utilities/generateMeta.ts` and the posts and search page titles, the Open Graph site name in `src/utilities/mergeOpenGraph.ts`, and the seed button's label ("Seed your database with Studio").
 
+### Colour mode
+
+The theme's `colorMode` comes through the generated manifest too. The frontend's theme script under `src/providers/Theme` reads it: `light` or `dark` sets that palette for every visitor, `system` follows the device setting. There is no admin setting and no visitor switch.
+
 ### `src/engine/payload/`
 
 Hand-written helpers the generated config imports:
@@ -138,7 +142,7 @@ Stays:
 - `src/components/CollectionArchive` and `Card`: the posts index and the search page render through them; the `List` primitive replaces only the archive block.
 - The form field components (`Checkbox`, `Country`, `Email`, `Message`, `Number`, `Select`, `State`, `Text`, `Textarea`, `Width`, `Error`): they live under `src/engine/primitives/form/`, where the `Form` primitive imports them.
 - `src/fields/linkGroup.ts`: unused by the generated blocks, kept as part of the stock field library.
-- Everything under `src/components/ui`, `Media`, `RichText`, `Link`, providers, utilities.
+- Everything under `src/components/ui`, `Media`, `RichText`, `Link`, providers (the theme script reads `colorMode`), utilities.
 
 ## 8. Admin experience
 

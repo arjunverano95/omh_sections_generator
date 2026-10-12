@@ -31,12 +31,13 @@ BLAST:     src/engine/** (new); src/generated/** (new, ignored); templates/** (n
            src/app/(frontend)/layout.tsx, [slug]/page.tsx, globals.css; src/endpoints/seed/**;
            the site-name consumers (src/plugins/index.ts, src/utilities/generateMeta.ts,
            src/utilities/mergeOpenGraph.ts, the posts and search page titles, the seed button);
+           the theme script under src/providers/Theme (colorMode from the manifest);
            package.json, pnpm-lock.yaml, .gitignore, .nvmrc, Dockerfile (node base);
            src/payload-types.ts, src/app/(payload)/admin/importMap.js (regenerated);
            phase 4 only: removal of src/blocks/{ArchiveBlock,CallToAction,Content,Form,RenderBlocks.tsx},
            src/heros/{config.ts,HighImpact,MediumImpact,LowImpact,RenderHero.tsx}, src/Header/**,
            src/Footer/**, the stock seed documents.
-           NOT src/collections/{Posts,Media,Categories,Users}, NOT src/providers,
+           NOT src/collections/{Posts,Media,Categories,Users}, NOT the other src/providers,
            NOT src/components/{Media,RichText,Link,ui}, NOT the post page.
 PRECEDENT: src/Header/config.ts (global shape, link() usage, RowLabel path, afterChange revalidate);
            src/blocks/Form/Component.tsx (form submission flow); src/utilities/getGlobals.ts (cached
@@ -57,7 +58,7 @@ MODE:   Persuade. Studio is a marketing site whose job is to make a visitor act.
 LEAD:   The hero heading on each page. Everything above the fold serves it.
 ACTION: The primary button in the hero (start a project), repeated in the header CTA and in the
         closing band or contact section.
-QUIET:  Secondary buttons, the footer, metadata on post cards, the theme selector.
+QUIET:  Secondary buttons, the footer, metadata on post cards.
 ```
 
 ## Implementation Plan
@@ -94,7 +95,7 @@ Six phases. Each ends in a state that runs and is committed on its own. Phase 2 
 ### Phase 3: the site: theme, globals, the section library and its seed
 
 1. `theme.css` and `fonts.ts` emission; `globals.css` gains `@source` and the `--font-heading` slot; `layout.tsx` imports both and mounts `RenderGlobal` for header and footer.
-2. `globals.ts` emission with `revalidateGlobal`; `payload.config.ts` uses the generated globals. `siteName` from the theme feeds the metadata, Open Graph and the seed button.
+2. `globals.ts` emission with `revalidateGlobal`; `payload.config.ts` uses the generated globals. `siteName` from the theme feeds the metadata, Open Graph and the seed button; `colorMode` reaches the frontend's theme script through the manifest.
 3. `Form` primitive from the stock `FormBlock`; `List` primitive with `select` derivation, `where` placeholders and the synthetic `url`.
 4. The sixteen sections of [demo-site.md](demo-site.md), in their five drawer groups.
 5. `src/engine/seed/` reading `templates/seed/`; the four pages, the globals, the two forms and the media; the demo posts under `src/engine/seed/`; the seed endpoint calls `seedSite`.
@@ -123,7 +124,7 @@ Six phases. Each ends in a state that runs and is committed on its own. Phase 2 
 - `src/collections/Pages/index.ts`, `src/payload.config.ts`
 - `src/app/(frontend)/layout.tsx`, `src/app/(frontend)/[slug]/page.tsx`, `src/app/(frontend)/globals.css`
 - `src/endpoints/seed/index.ts`
-- the site-name consumers listed in BLAST
+- the site-name consumers and the theme script listed in BLAST
 - `src/payload-types.ts`, `src/app/(payload)/admin/importMap.js`
 - `package.json`, `pnpm-lock.yaml`, `.gitignore`, `Dockerfile`
 - `tests/int/engine/**`, `tests/fixtures/templates/**`, `tests/e2e/**`
@@ -155,7 +156,6 @@ Six phases. Each ends in a state that runs and is committed on its own. Phase 2 
 - **Fonts at build time.** `next/font/google` downloads at build; an offline build fails. Local font files under `templates/assets/fonts/` with a `next/font/local` loader is the natural extension and is out of scope.
 - **List revalidation.** Publishing a post does not revalidate pages that list posts. Fix: an `afterChange` on Posts calling `revalidateTag('sections:posts')` and that tag on the `List` query.
 - **Mobile navigation.** The Studio header has no mobile menu; it hides the nav below `md`. The `details` container tag and the `summary` text tag, which the FAQ section uses, are enough for a config-only menu in `header.yaml`; that menu is the follow-up.
-- **Default colour mode.** `theme.yaml` declares a `light` and a `dark` set. Which one a visitor gets first is the stock behaviour of the `InitTheme` script: their saved choice, else their system preference. An optional `defaultMode` in the theme, emitted as a generated constant that `InitTheme` reads ahead of the system preference, is the follow-up; it touches `src/providers/Theme`, which this plan leaves alone.
 - **Lexical is bundled once per Next server layer.** `getPayload` caches one instance for every layer, so a route handler that converts Markdown with editors taken from `payload.config` fails with "is not a constructor that subclasses LexicalNode" once the admin layer has initialised. The seeder builds its converter from the `config` its caller imports (`editorConfigFactory.fromField`), and the seed route passes its own. Any new server-side Lexical conversion needs the same care.
 - **Media files on reseed.** The seeder clears collections through the database adapter, so the documents go but the files under `public/media/` stay, and the next seed uploads them again with `-1`, `-2` suffixes, as the stock seed does. Harmless locally; a deployment that reseeds would clear the folder first.
 - **Playwright and the tsx loader.** `test:e2e` runs Playwright under `--import=tsx/esm`, which conflicts with Playwright 1.63's own TypeScript ESM loader, so the script also sets `PW_DISABLE_TS_ESM=1`.

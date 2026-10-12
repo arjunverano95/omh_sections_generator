@@ -113,7 +113,7 @@ The original brief is [docs/ASSIGNMENT.md](docs/ASSIGNMENT.md).
 ```
 templates/
   schema.json              JSON Schema for editor validation (generated, committed)
-  theme.yaml               site name, fonts, colour tokens, radius, variants
+  theme.yaml               site name, colour mode, fonts, colour tokens, radius, variants
   globals/                 header.yaml, footer.yaml
   sections/                one section per file
   seed/                    pages.yaml, globals.yaml, forms.yaml, media.yaml, media/

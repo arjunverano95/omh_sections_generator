@@ -32,7 +32,7 @@ Make everything a visitor sees config-driven. In the stock template every hero, 
 | **Primitive** | A generic renderable building block (text, image, button, container, repeater, form). Written once in React. |
 | **Layout tree** | The nested list of primitive nodes that says how a section's fields are arranged and styled. |
 | **Render plan** | The compiler's normalised, validated form of every layout tree, consumed by the renderer. |
-| **Theme** | The site name, brand tokens (fonts, colours, radius) and named class presets (variants). `templates/theme.yaml`. |
+| **Theme** | The site name, colour mode, brand tokens (fonts, colours, radius) and named class presets (variants). `templates/theme.yaml`. |
 | **Site** | The Studio demo: what the templates folder describes and the seed fills with content. |
 
 ## 3. Architecture
@@ -80,7 +80,7 @@ The engine grows only when a section needs a primitive or an option that does no
 ```
 templates/
   schema.json                 JSON Schema for editor validation (generated, committed)
-  theme.yaml                  site name, fonts, colours, radius, variants
+  theme.yaml                  site name, colour mode, fonts, colours, radius, variants
   globals/header.yaml
   globals/footer.yaml
   sections/*.yaml             one section per file
