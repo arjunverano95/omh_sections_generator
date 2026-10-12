@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=../../schema.json
+kind: global
+name: header
+fields:
+  logo:
+    type: image
+    required: true
+  navItems:
+    type: array
+    max: 6
+    rowLabel: link
+    fields:
+      link: link
+  cta: link
+
+layout:
+  - div: container flex items-center justify-between gap-6 py-5
+    as: header
+    children:
+      - button: { href: { value: / } }
+        class: block shrink-0
+        children:
+          - image: logo
+            class: h-8 w-auto
+            priority: true
+      - each: navItems
+        as: nav
+        class: hidden items-center gap-7 md:flex
+        children:
+          - button: link
+            variant: button.link
+      - button: cta
+        variant: button.primary
+        if: cta
