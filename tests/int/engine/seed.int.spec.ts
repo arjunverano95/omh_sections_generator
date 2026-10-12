@@ -368,6 +368,46 @@ describe('seedTemplate', () => {
     expect((header.data as { navItems: unknown[] }).navItems).toHaveLength(3)
   })
 
+  it('passes a form redirect through and converts each notification email message', async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), 'seed-forms-'))
+    try {
+      await mkdir(path.join(dir, 'seed'), { recursive: true })
+      await writeFile(
+        path.join(dir, 'seed', 'forms.yaml'),
+        [
+          '- key: quote',
+          '  title: Quote request',
+          '  confirmationType: redirect',
+          '  redirect:',
+          '    url: /thanks',
+          '  emails:',
+          '    - emailTo: hello@example.com',
+          '      subject: New quote request',
+          '      message: "Thanks, **{{name}}**"',
+          '  fields:',
+          '    - blockType: text',
+          '      name: name',
+          '      required: true',
+        ].join('\n'),
+      )
+      const { payload, calls } = mockPayload()
+      await seedTemplate({ payload, req, templateDir: dir, manifest })
+
+      const form = calls.find((call) => call.collection === 'forms')!.args.data as Record<string, unknown>
+      expect(form.confirmationType).toBe('redirect')
+      expect(form.redirect).toEqual({ url: '/thanks' })
+      expect(form.emails).toEqual([
+        {
+          emailTo: 'hello@example.com',
+          subject: 'New quote request',
+          message: { lexical: 'Thanks, **{{name}}**', target: { collection: 'forms', fieldPath: ['emails', 'message'] } },
+        },
+      ])
+    } finally {
+      await rm(dir, { recursive: true, force: true })
+    }
+  })
+
   it('writes nothing when the seed is invalid', async () => {
     const { payload, calls } = mockPayload()
     const broken: Manifest = { ...manifest, sections: { ...manifest.sections, contact: section('contact', [f('heading', 'text')]) } }

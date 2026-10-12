@@ -70,3 +70,13 @@ Environment variables the code reads: `DATABASE_URL`, `PAYLOAD_SECRET`, `PREVIEW
 - No AI attribution on commits, pull requests, issues or comments: no `Co-Authored-By` naming an AI, no "generated with" notes, no session links.
 - Never commit secrets, `.env` files or database dumps.
 - Never run destructive git (`reset --hard`, `push --force`, `clean -f`) without an explicit instruction.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

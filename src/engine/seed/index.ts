@@ -244,6 +244,15 @@ export async function seedTemplate({ payload, req, templateDir, manifest, postsD
       confirmationMessage: form.confirmationMessage
         ? toLexical(form.confirmationMessage, { collection: 'forms', fieldPath: ['confirmationMessage'] })
         : undefined,
+      redirect: form.redirect,
+      // Each notification email's message is Markdown in the seed and rich text in the form.
+      emails: form.emails?.map((email) => ({
+        ...email,
+        message:
+          typeof email.message === 'string'
+            ? toLexical(email.message, { collection: 'forms', fieldPath: ['emails', 'message'] })
+            : email.message,
+      })),
     }
     const doc = await payload.create({
       collection: 'forms',
