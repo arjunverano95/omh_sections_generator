@@ -10,7 +10,7 @@ Part of the [Sections Engine Specification](README.md). Two site faces prove the
 | Field types | text, textarea, richText, image, icon, link, select, array, form, relation | text, textarea, richText, image, icon, link, select, number, checkbox, array, form |
 | `if` | bare reference, `equals` on a select | bare reference, `equals` and `not` on a checkbox |
 | `list` | posts with a `where` placeholder from a `relation` | none |
-| Theme | light default, serif headings, soft radius | dark default, grotesk type, sharp radius |
+| Theme | designed for the light set, serif headings, soft radius | designed for the dark set, grotesk type, sharp radius |
 | Header | logo image, nav, one CTA | wordmark text, nav, two CTAs |
 | Footer | link columns, note, social icons | single row: copyright, links, social icons |
 | Seeded pages | Home, Contact | Home |
@@ -40,7 +40,7 @@ Everything under `templates/` for both faces is YAML and media. Zero `.ts` or `.
 
 ## 3. template-2 "Launch"
 
-**Theme.** `Space Grotesk` for everything. Near-black background by default, off-white text, electric lime primary, `0.25rem` radius. The light set is provided. Variants: `heading.hero`, `heading.section`, `text.lead`, `text.badge`, `button.primary`, `button.secondary`, `button.link`, `card.plan`, `card.planHighlighted`.
+**Theme.** `Space Grotesk` for everything. The dark set is the designed look: near-black background, off-white text, electric lime primary, `0.25rem` radius. A proper light set is provided too. Which set a visitor sees first is the stock template's behaviour (their saved choice, else their system preference); a theme file does not pick a default mode, see the open issue in [build-plan.md](build-plan.md#open-issues). Variants: `heading.hero`, `heading.section`, `text.lead`, `text.badge`, `button.primary`, `button.secondary`, `button.link`, `card.plan`, `card.planHighlighted`.
 
 **Header.** `wordmark` (text, required), `navItems` (array of `link`, max 5), `primaryCta` link, `secondaryCta` link.
 
@@ -53,7 +53,7 @@ Everything under `templates/` for both faces is YAML and media. Zero `.ts` or `.
 | `hero-centered` | `badge` text · `heading` text required · `description` textarea · `bullets` array (`icon`, `text`) max 4 · `primaryButton` link · `secondaryButton` link · `backgroundImage` image | full-height centred stack; background image absolutely positioned behind, `if: backgroundImage`; bullets as a `ul` of icon + text |
 | `logo-strip` | `heading` text · `logos` array (`image`, `name` text) max 8 | one line of greyscale logos |
 | `feature-rows` | `rows` array (`title` text, `body` richText, `image` image, `reverse` checkbox) | each row a two-column grid; two layouts under `if: { field: reverse, equals: true }` and `if: { field: reverse, not: true }` to swap the image side |
-| `pricing` | `heading` text · `plans` array (`name` text, `price` number, `period` select `month`/`year`, `features` array of `text`, `button` link, `highlighted` checkbox) | three cards; `card.planHighlighted` variant under `if: highlighted` |
+| `pricing` | `heading` text · `plans` array (`name` text, `price` number, `period` select `month`/`year`, `features` array with one `text` field per row, `button` link, `highlighted` checkbox) | three cards; two card `div`s with `variant: card.plan` and `variant: card.planHighlighted`, chosen by `if: { field: highlighted, equals: true }` and `not: true` |
 | `cta-band` | `heading` text · `text` textarea · `button` link | full-width primary band |
 | `newsletter` | `heading` text · `text` textarea · `form` form required | compact centred form |
 
@@ -67,6 +67,7 @@ The brief's example describes a hero with a heading, a description, two buttons,
 name: hero-centered
 label: Centered hero
 fields:
+  badge: text
   heading:
     type: text
     required: true
@@ -91,6 +92,10 @@ layout:
         if: backgroundImage
       - div: container relative flex flex-col items-center gap-6 text-center
         children:
+          - text: badge
+            as: span
+            variant: text.badge
+            if: badge
           - text: heading
             as: h1
             variant: heading.hero

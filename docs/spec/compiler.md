@@ -178,7 +178,7 @@ type PlanNode =
   | { type: 'richText'; source: Ref; className?: string; if?: Condition }
   | { type: 'image';    source: Ref; className?: string; priority?: boolean; sizes?: string; if?: Condition }
   | { type: 'icon';     source: Ref; className?: string; size?: number; if?: Condition }
-  | { type: 'button';   source: Ref | { label: string; href: Source; newTab?: boolean }; className?: string; if?: Condition }
+  | { type: 'button';   source: Ref | { label?: string; href: Source; newTab?: boolean }; children?: PlanNode[]; className?: string; if?: Condition }
   | { type: 'div';      as: ContainerTag; className?: string; children: PlanNode[]; if?: Condition }
   | { type: 'each';     source: Ref; as?: ContainerTag; className?: string; children: PlanNode[]; if?: Condition }
   | { type: 'list';     query: ListQuery; as?: ContainerTag; className?: string; children: PlanNode[] }

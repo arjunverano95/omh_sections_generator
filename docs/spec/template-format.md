@@ -207,17 +207,17 @@ Rows may nest arrays one level deep. Deeper nesting is rejected; it makes the ad
 | `richText` | reference to `richText` | the rich text | `class`, `variant`, `if` |
 | `image` | reference to `image` | the media, through the project's `Media` component | `class`, `priority`, `sizes`, `if` |
 | `icon` | reference to `icon` | an SVG icon | `class`, `size`, `if` |
-| `button` | reference to `link`, or a literal (6.3) | an anchor | `class`, `variant`, `if` |
-| `div` | class string | an element with children | `as`, `children` (required), `if` |
-| `each` | reference to `array` | `children` once per row | `as`, `class`, `children` (required), `if` |
-| `list` | a query (6.4) | `children` once per document | `as`, `class`, `children` (required) |
+| `button` | reference to `link`, or a literal (6.3) | an anchor; with `children`, the anchor wraps them | `class`, `variant`, `children` (optional), `if` |
+| `div` | class string | an element with children | `as`, `variant`, `children` (required), `if` |
+| `each` | reference to `array` | `children` once per row | `as`, `class`, `variant`, `children` (required), `if` |
+| `list` | a query (6.4) | `children` once per document | `as`, `class`, `variant`, `children` (required) |
 | `form` | reference to `form` | the form, submitting to the form-builder plugin | `class`, `if` |
 
 **`as`.** For `text`: `p`, `span`, `h1` to `h6`, `blockquote`, `small`, `strong`, `em`, `li`, `dt`, `dd`, `figcaption`. For `div`, `each` and `list`: `div`, `section`, `header`, `footer`, `nav`, `main`, `article`, `aside`, `ul`, `ol`, `li`, `figure`. `each` and `list` without `as` render their rows with no wrapper element.
 
 **`class`.** Tailwind classes, applied after the variant's classes. On `div` the primitive key's value *is* the class string, so `div` has no separate `class` option.
 
-**`variant`.** `group.name` from the theme. Allowed on `text`, `richText`, `button`.
+**`variant`.** `group.name` from the theme. Allowed on every node; the variant's classes come first, the node's own classes after, so a node can extend or override a preset.
 
 **`if`.** Section 6.5.
 
@@ -244,6 +244,19 @@ A button whose label is fixed and whose target comes from the data is written wi
 ```
 
 In the literal button form `label` is text, `href` is a reference unless written as `{ value }`, and `newTab` is a boolean.
+
+A button may carry `children`, in which case the anchor wraps them instead of a label. That is how a logo links home and how a wordmark field becomes a link. With `children`, `label` is optional in the literal form; for a `link` reference, the link's label becomes the anchor's accessible name.
+
+```yaml
+- button: { href: { value: / } }
+  class: block
+  children:
+    - image: logo
+      class: h-8 w-auto
+- button: link                       # a footer social row: icon inside the anchor
+  children:
+    - icon: icon
+```
 
 ### 6.4 `list`
 
@@ -302,11 +315,11 @@ layout:
   - div: container flex items-center justify-between py-5
     as: header
     children:
-      - button: { label: { value: Home }, href: { value: / } }
-        class: block h-8
-        children: []
-      - image: logo
-        class: h-8 w-auto
+      - button: { href: { value: / } }
+        class: block
+        children:
+          - image: logo
+            class: h-8 w-auto
       - each: navItems
         as: nav
         class: hidden items-center gap-7 md:flex
@@ -376,7 +389,7 @@ The compiler rejects a template when any of these fails. Every message names the
 5. Every reference resolves to a field in scope whose type the primitive accepts (6.1). Unknown names suggest the closest declared name.
 6. Dot paths only traverse `link`, `image`, `relation` and `list` rows, and only to known properties.
 7. `variant` references exist in the theme.
-8. `as` is in the allowed list for that primitive. Containers have `children`; leaves do not.
+8. `as` is in the allowed list for that primitive. `div`, `each` and `list` have `children`; `button` may; no other node does. A literal button without `children` has a `label`.
 9. `if` names a field in scope; `equals`/`not` values match the field's type.
 10. `list.collection` is allowed, `limit` is 1 to 50, `sort` names a field of that collection, `where` placeholders name section fields.
 11. Theme: `fonts.sans` set; colour tokens are from the slot list; `light` has the four required tokens; `radius` is a CSS length.

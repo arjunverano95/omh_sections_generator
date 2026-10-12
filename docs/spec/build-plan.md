@@ -65,7 +65,7 @@ Six phases. Each ends in a state that runs and is committed on its own. Phase 2 
 
 ### Phase 0: the repository runs
 
-1. Pin `payload` and every `@payloadcms/*` package to the same published 3.x version; `pnpm install`; commit the lockfile.
+1. Pin `payload` and every `@payloadcms/*` package to `4.0.0-beta.0`, the release the base commit was written against (it is 35 minutes younger than that publish, and `@payloadcms/transformer-sharp` exists only in 4.x); `pnpm install`; commit the lockfile.
 2. Bump the Dockerfile base image to a Node 24 tag so it satisfies the `engines` field; `.nvmrc` already says `24.15.0`.
 3. `pnpm dev` serves the stock template; log in to the admin; seed; the stock home page renders.
 4. `pnpm lint`, `pnpm build`, `pnpm test:int` pass as a baseline.
@@ -149,11 +149,12 @@ Six phases. Each ends in a state that runs and is committed on its own. Phase 2 
 
 ## Open Issues
 
-- **Published versions to pin.** Pick one 3.x release for `payload` and all `@payloadcms/*`; everything in this spec targets 3.x APIs that have been stable since 3.0 (`select` on find, block `interfaceName`, component paths with `clientProps`). Block `admin.group` is used if the pinned version has it, otherwise the group is prefixed to the block label.
+- **Payload is a 4.0 pre-release.** The template snapshot imports `@payloadcms/transformer-sharp`, which has no 3.x release, so the project pins `4.0.0-beta.0` rather than patching the template back to 3.x. Everything this spec relies on (`select` on find, block `interfaceName`, component paths with `clientProps`, Lexical, the form-builder plugin) is unchanged between 3.x and 4.0; any API that moved is found at install time and recorded here.
 - **Node base image.** The Dockerfile uses `node:22.17.0-alpine`; `engines` requires `>=24.15.0`. Phase 0 bumps it.
 - **Tailwind source scope.** `@source "../../../templates"` compiles both faces' utilities. Narrowing to the active template needs the directive in a generated file; try `@source` inside the generated `theme.css` imported from `globals.css` and keep the broad directive if it is not honoured there.
 - **Fonts at build time.** `next/font/google` downloads at build; an offline build fails. Local font files under `templates/<t>/assets/fonts/` with a `next/font/local` loader is the natural extension and is out of scope.
 - **List revalidation.** Publishing a post does not revalidate pages that list posts. Fix: an `afterChange` on Posts calling `revalidateTag('sections:posts')` and that tag on the `List` query. Small; do it if phase 4 has room.
+- **Default colour mode.** `theme.yaml` declares a `light` and a `dark` set but not which one a first-time visitor gets; the stock `InitTheme` script decides (saved choice, else system preference, else light). A face "designed dark" therefore shows its light set to a light-OS visitor. The follow-up is an optional `defaultMode` in the theme file, emitted as a generated constant that `InitTheme` reads ahead of the system preference; it touches `src/providers/Theme`, which this plan otherwise leaves alone, so it is out of scope.
 - **Mobile navigation.** The generated header has no client-side menu. A config-only `details`/`summary` disclosure, or a `nav` primitive with a built-in toggle, is the follow-up.
 - **Unknown block types after a switch.** Pages authored under the other template keep rows the active config cannot edit. The demo reseeds; a real deployment would pin a template per environment.
 - **`home-static` fallback.** Replaced by a seed-derived fallback in phase 2; until then an unseeded database shows the stock static home.
