@@ -10,11 +10,11 @@ Read first, in this order:
 
 1. [docs/ASSIGNMENT.md](docs/ASSIGNMENT.md): the brief and what needs to be done.
 2. [docs/spec/README.md](docs/spec/README.md): the specification. It indexes the format, compiler, renderer, Payload integration, demo templates, build plan and decisions.
-3. [llms.txt](llms.txt): the index of official Payload 3.x documentation. Fetch the linked page before guessing at a Payload API.
+3. [llms.txt](llms.txt): the index of the official Payload 4.x documentation, the line the pinned version belongs to. Fetch the linked page before guessing at a Payload API.
 
 ## Stack
 
-- Payload 3.x (admin, Local API, Lexical rich text) inside Next.js 16 App Router, React 19, TypeScript.
+- Payload `4.0.0-beta.0` (admin, Local API, Lexical rich text) inside Next.js 16 App Router, React 19, TypeScript. The pre-release is deliberate: the template snapshot was written against it and 3.x lacks `@payloadcms/transformer-sharp`.
 - MongoDB through `@payloadcms/db-mongodb`.
 - Tailwind CSS 4 with shadcn-style components in `src/components/ui`.
 - pnpm; Node version in `.nvmrc`.
