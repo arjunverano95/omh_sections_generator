@@ -24,6 +24,7 @@ export const TEXT_TAGS = [
   'dt',
   'dd',
   'figcaption',
+  'summary',
 ] as const
 export type TextTag = (typeof TEXT_TAGS)[number]
 
@@ -42,6 +43,7 @@ export const CONTAINER_TAGS = [
   'figure',
   'figcaption',
   'blockquote',
+  'details',
 ] as const
 export type ContainerTag = (typeof CONTAINER_TAGS)[number]
 

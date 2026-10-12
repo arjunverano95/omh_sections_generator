@@ -287,6 +287,26 @@ describe('primitives', () => {
     expect(el.innerHTML).toBe('<section class="container py-20"><h1>Hi</h1></section>')
   })
 
+  it('a details container with a summary text renders a native disclosure', async () => {
+    const el = await render(
+      [
+        {
+          type: 'div',
+          as: 'details',
+          className: 'group border-b',
+          children: [
+            { type: 'text', source: { path: ['question'] }, as: 'summary', className: 'py-4' },
+            { type: 'text', source: { path: ['answer'] }, as: 'p' },
+          ],
+        },
+      ],
+      [{ question: 'How long does a site take?', answer: 'Eight to twelve weeks.' }],
+    )
+    expect(el.innerHTML).toBe(
+      '<details class="group border-b"><summary class="py-4">How long does a site take?</summary><p>Eight to twelve weeks.</p></details>',
+    )
+  })
+
   it('form renders the populated form document and nothing for an id', async () => {
     const form = {
       id: 'f1',
