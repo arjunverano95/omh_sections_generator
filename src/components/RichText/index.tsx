@@ -13,18 +13,13 @@ import {
 
 import { CodeBlock, CodeBlockProps } from '@/blocks/Code/Component'
 
-import type {
-  BannerBlock as BannerBlockProps,
-  CallToActionBlock as CTABlockProps,
-  MediaBlock as MediaBlockProps,
-} from '@/payload-types'
+import type { BannerBlock as BannerBlockProps, MediaBlock as MediaBlockProps } from '@/payload-types'
 import { BannerBlock } from '@/blocks/Banner/Component'
-import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { cn } from '@/utilities/ui'
 
+// The blocks a post body can hold (Posts collection, BlocksFeature): banner, code and media.
 type NodeTypes = WithDefaultNodes<
   | SerializedBlockNode<BannerBlockProps>
-  | SerializedBlockNode<CTABlockProps>
   | SerializedBlockNode<CodeBlockProps>
   | SerializedBlockNode<MediaBlockProps>
 >
@@ -54,7 +49,6 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
       />
     ),
     code: ({ node }) => <CodeBlock className="col-start-2" {...node.fields} />,
-    cta: ({ node }) => <CallToActionBlock {...node.fields} />,
   },
 })
 
