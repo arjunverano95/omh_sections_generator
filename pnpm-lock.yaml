@@ -156,6 +156,9 @@ importers:
       prettier:
         specifier: ^3.4.2
         version: 3.9.10
+      sharp:
+        specifier: 0.35.5
+        version: 0.35.5(@types/node@24.12.3)
       tailwindcss:
         specifier: ^4.1.18
         version: 4.3.3
@@ -9127,7 +9130,6 @@ snapshots:
       '@img/sharp-win32-ia32': 0.35.5
       '@img/sharp-win32-x64': 0.35.5
       '@types/node': 24.12.3
-    optional: true
 
   shebang-command@2.0.0:
     dependencies:
