@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=../schema.json
+name: hero-simple
+label: Simple hero
+plural: Simple heroes
+description: An eyebrow, a heading and a short paragraph, no image. Suits inner pages.
+group: Heroes
+
+fields:
+  eyebrow: text
+  heading:
+    type: text
+    required: true
+  description: textarea
+
+layout:
+  - div: container py-20 md:py-28
+    as: section
+    children:
+      - div: flex max-w-3xl flex-col gap-5
+        children:
+          - text: eyebrow
+            as: span
+            variant: text.eyebrow
+            if: eyebrow
+          - text: heading
+            as: h1
+            variant: heading.display
+          - text: description
+            variant: text.lead
+            if: description

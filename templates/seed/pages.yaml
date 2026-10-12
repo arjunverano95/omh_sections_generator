@@ -42,13 +42,79 @@
         text: Tell us about the project, the timeline and who you are writing for.
         form: "@form/contact"
 
+- slug: about
+  title: About
+  meta:
+    title: About
+    description: Who Studio is, how we work and what to expect when we work together.
+    image: "@media/about.jpg"
+  sections:
+    - hero-cover:
+        eyebrow: About
+        heading: A small studio that writes things down.
+        description: Four people, one long table and a shared conviction that good design starts with reading the brief properly.
+        button: { type: reference, reference: "@page/contact", label: Work with us }
+        image: "@media/about.jpg"
+    - stats:
+        heading: Studio in numbers
+        intro: Small on purpose, and busy enough to stay sharp.
+        items:
+          - value: "12"
+            label: Years in practice
+          - value: 140+
+            label: Projects shipped
+          - value: "4"
+            label: People at the table
+          - value: "3"
+            label: Cities we work from
+    - team:
+        heading: The people
+        intro: Everyone here designs, everyone here writes, and everyone answers the phone.
+        members:
+          - photo: "@media/team-ines.jpg"
+            name: Ines Okafor
+            role: Founder and creative director
+          - photo: "@media/team-tomas.jpg"
+            name: Tomas Reyes
+            role: Design lead
+          - photo: "@media/team-hana.jpg"
+            name: Hana Sato
+            role: Editorial strategist
+          - photo: "@media/team-leo.jpg"
+            name: Leo Marchetti
+            role: Developer
+    - faq:
+        heading: Questions we hear
+        intro: If yours is not here, ask it on the contact page.
+        items:
+          - question: How long does a project take?
+            answer: |
+              A website usually takes **eight to twelve weeks** from the first call to the day it goes live. An identity takes four to six. We agree the dates before we start and keep to them.
+          - question: Do you work with in-house teams?
+            answer: |
+              Often. We are happiest sitting beside your editors and developers, and we hand over everything we make: files, type specimens, the CMS and the notes behind each decision.
+          - question: Which CMS do you build on?
+            answer: |
+              Payload, for most sites. It lets us shape the editing experience around how your team actually writes, rather than around a theme.
+          - question: Can you write the copy as well?
+            answer: |
+              Yes. Editorial strategy is one of the three things we do, and the work goes better when words and layout are drafted together.
+          - question: What does a project cost?
+            answer: |
+              It depends on scope, so we quote after the first call. Most websites land between a small brand refresh and a full publication; we will tell you plainly where yours sits.
+    - testimonial:
+        quote: |
+          They asked better questions about our readers than we had ever asked ourselves. The site followed from the answers.
+        name: Daniel Achebe
+        role: Publisher, Fieldnotes Quarterly
+
 - slug: contact
   title: Contact
   meta:
     title: Contact
     description: Start a project with Studio.
   sections:
-    - hero-split:
+    - hero-simple:
         eyebrow: Contact
         heading: Let's make something people read.
         description: Most projects start with a short call. Write to us below and we will set one up.

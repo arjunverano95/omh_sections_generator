@@ -36,6 +36,58 @@ export const ContactBlock: Block = {
   ],
 }
 
+export const FaqBlock: Block = {
+  slug: 'faq',
+  interfaceName: 'FaqBlock',
+  labels: {
+    singular: 'FAQ',
+    plural: 'FAQs',
+  },
+  admin: {
+    group: 'Content',
+  },
+  fields: [
+    {
+      name: 'heading',
+      type: 'text',
+      label: 'Heading',
+    },
+    {
+      name: 'intro',
+      type: 'textarea',
+      label: 'Intro',
+    },
+    {
+      name: 'items',
+      type: 'array',
+      label: 'Items',
+      minRows: 1,
+      maxRows: 12,
+      fields: [
+        {
+          name: 'question',
+          type: 'text',
+          label: 'Question',
+          required: true,
+        },
+        {
+          name: 'answer',
+          type: 'richText',
+          label: 'Answer',
+          required: true,
+          editor: defaultLexical,
+        },
+      ],
+      admin: {
+        initCollapsed: true,
+        components: {
+          RowLabel: rowLabel('question'),
+        },
+      },
+    },
+  ],
+}
+
 export const FeaturesBlock: Block = {
   slug: 'features',
   interfaceName: 'FeaturesBlock',
@@ -103,6 +155,77 @@ export const FeaturesBlock: Block = {
           RowLabel: rowLabel('title'),
         },
       },
+    },
+  ],
+}
+
+export const HeroCoverBlock: Block = {
+  slug: 'hero-cover',
+  interfaceName: 'HeroCoverBlock',
+  labels: {
+    singular: 'Cover hero',
+    plural: 'Cover heroes',
+  },
+  admin: {
+    group: 'Heroes',
+  },
+  fields: [
+    {
+      name: 'eyebrow',
+      type: 'text',
+      label: 'Eyebrow',
+    },
+    {
+      name: 'heading',
+      type: 'text',
+      label: 'Heading',
+      required: true,
+    },
+    {
+      name: 'description',
+      type: 'textarea',
+      label: 'Description',
+    },
+    linkField('button', { label: 'Button' }),
+    {
+      name: 'image',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Image',
+      required: true,
+      admin: {
+        description: 'Fills the section. Keep the lower third quiet; the copy sits there.',
+      },
+    },
+  ],
+}
+
+export const HeroSimpleBlock: Block = {
+  slug: 'hero-simple',
+  interfaceName: 'HeroSimpleBlock',
+  labels: {
+    singular: 'Simple hero',
+    plural: 'Simple heroes',
+  },
+  admin: {
+    group: 'Heroes',
+  },
+  fields: [
+    {
+      name: 'eyebrow',
+      type: 'text',
+      label: 'Eyebrow',
+    },
+    {
+      name: 'heading',
+      type: 'text',
+      label: 'Heading',
+      required: true,
+    },
+    {
+      name: 'description',
+      type: 'textarea',
+      label: 'Description',
     },
   ],
 }
@@ -177,6 +300,118 @@ export const LatestPostsBlock: Block = {
   ],
 }
 
+export const StatsBlock: Block = {
+  slug: 'stats',
+  interfaceName: 'StatsBlock',
+  labels: {
+    singular: 'Stats',
+    plural: 'Stats',
+  },
+  admin: {
+    group: 'Content',
+  },
+  fields: [
+    {
+      name: 'heading',
+      type: 'text',
+      label: 'Heading',
+    },
+    {
+      name: 'intro',
+      type: 'textarea',
+      label: 'Intro',
+    },
+    {
+      name: 'items',
+      type: 'array',
+      label: 'Items',
+      minRows: 2,
+      maxRows: 4,
+      fields: [
+        {
+          name: 'value',
+          type: 'text',
+          label: 'Value',
+          required: true,
+          admin: {
+            description: 'The figure as it should read, such as 12, 140+ or 98%.',
+          },
+        },
+        {
+          name: 'label',
+          type: 'text',
+          label: 'Label',
+          required: true,
+        },
+      ],
+      admin: {
+        initCollapsed: true,
+        components: {
+          RowLabel: rowLabel('label'),
+        },
+      },
+    },
+  ],
+}
+
+export const TeamBlock: Block = {
+  slug: 'team',
+  interfaceName: 'TeamBlock',
+  labels: {
+    singular: 'Team',
+    plural: 'Teams',
+  },
+  admin: {
+    group: 'Social proof',
+  },
+  fields: [
+    {
+      name: 'heading',
+      type: 'text',
+      label: 'Heading',
+    },
+    {
+      name: 'intro',
+      type: 'textarea',
+      label: 'Intro',
+    },
+    {
+      name: 'members',
+      type: 'array',
+      label: 'Members',
+      maxRows: 8,
+      fields: [
+        {
+          name: 'photo',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Photo',
+          admin: {
+            description: 'Square works best.',
+          },
+        },
+        {
+          name: 'name',
+          type: 'text',
+          label: 'Name',
+          required: true,
+        },
+        {
+          name: 'role',
+          type: 'text',
+          label: 'Role',
+        },
+      ],
+      admin: {
+        initCollapsed: true,
+        components: {
+          RowLabel: rowLabel('name'),
+        },
+      },
+    },
+  ],
+}
+
 export const TestimonialBlock: Block = {
   slug: 'testimonial',
   interfaceName: 'TestimonialBlock',
@@ -216,8 +451,13 @@ export const TestimonialBlock: Block = {
 
 export const blocks: Block[] = [
   ContactBlock,
+  FaqBlock,
   FeaturesBlock,
+  HeroCoverBlock,
+  HeroSimpleBlock,
   HeroSplitBlock,
   LatestPostsBlock,
+  StatsBlock,
+  TeamBlock,
   TestimonialBlock,
 ]

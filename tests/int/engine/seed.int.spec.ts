@@ -39,7 +39,18 @@ const section = (name: string, fields: FieldMeta[]): SectionMeta => ({
 
 const manifest: Manifest = {
   siteName: 'Studio',
-  blocks: ['hero-split', 'features', 'latest-posts', 'testimonial', 'contact'],
+  blocks: [
+    'contact',
+    'faq',
+    'features',
+    'hero-cover',
+    'hero-simple',
+    'hero-split',
+    'latest-posts',
+    'stats',
+    'team',
+    'testimonial',
+  ],
   globals: ['header', 'footer'],
   sections: {
     'hero-split': section('hero-split', [
@@ -72,6 +83,44 @@ const manifest: Manifest = {
       f('avatar', 'image'),
     ]),
     contact: section('contact', [f('heading', 'text'), f('text', 'textarea'), f('form', 'form', { required: true })]),
+    faq: section('faq', [
+      f('heading', 'text'),
+      f('intro', 'textarea'),
+      f('items', 'array', {
+        min: 1,
+        max: 12,
+        fields: [f('question', 'text', { required: true }), f('answer', 'richText', { required: true })],
+      }),
+    ]),
+    'hero-cover': section('hero-cover', [
+      f('eyebrow', 'text'),
+      f('heading', 'text', { required: true }),
+      f('description', 'textarea'),
+      f('button', 'link'),
+      f('image', 'image', { required: true }),
+    ]),
+    'hero-simple': section('hero-simple', [
+      f('eyebrow', 'text'),
+      f('heading', 'text', { required: true }),
+      f('description', 'textarea'),
+    ]),
+    stats: section('stats', [
+      f('heading', 'text'),
+      f('intro', 'textarea'),
+      f('items', 'array', {
+        min: 2,
+        max: 4,
+        fields: [f('value', 'text', { required: true }), f('label', 'text', { required: true })],
+      }),
+    ]),
+    team: section('team', [
+      f('heading', 'text'),
+      f('intro', 'textarea'),
+      f('members', 'array', {
+        max: 8,
+        fields: [f('photo', 'image'), f('name', 'text', { required: true }), f('role', 'text')],
+      }),
+    ]),
   },
   globalMeta: {
     header: {
@@ -239,8 +288,17 @@ describe('resolveValues', () => {
 describe('planSeed', () => {
   it('accepts the seed under templates/ and lists what it needs', async () => {
     const plan = await planSeed(TEMPLATES_DIR, manifest)
-    expect(plan.site.pages.map((page) => page.slug)).toEqual(['home', 'contact'])
-    expect(plan.siteMedia.sort()).toEqual(['avatar.jpg', 'hero.jpg', 'logo.svg'])
+    expect(plan.site.pages.map((page) => page.slug)).toEqual(['home', 'about', 'contact'])
+    expect(plan.siteMedia.sort()).toEqual([
+      'about.jpg',
+      'avatar.jpg',
+      'hero.jpg',
+      'logo.svg',
+      'team-hana.jpg',
+      'team-ines.jpg',
+      'team-leo.jpg',
+      'team-tomas.jpg',
+    ])
     expect(plan.categories.map((category) => category.slug)).toEqual(['technology', 'news', 'finance'])
   })
 
@@ -264,7 +322,7 @@ describe('planSeed', () => {
           '        image: "@media/missing.jpg"',
           '    - contact:',
           '        form: "@form/nope"',
-          '    - pricing: {}',
+          '    - gallery: {}',
         ].join('\n'),
       )
       const error = await planSeed(dir, manifest).catch((e: unknown) => e)
@@ -274,7 +332,7 @@ describe('planSeed', () => {
         expect.objectContaining({ where: 'page "home", section "hero-split" (sections[0])', path: 'headin' }),
         expect.objectContaining({ where: 'page "home", section "hero-split" (sections[0])', path: 'heading', message: 'is required' }),
         expect.objectContaining({ where: 'page "home", section "contact" (sections[1])', message: '"@form/nope" names no form in the seed' }),
-        expect.objectContaining({ where: 'page "home", section "pricing" (sections[2])', message: expect.stringMatching(/not a section; the sections are hero-split/) }),
+        expect.objectContaining({ where: 'page "home", section "gallery" (sections[2])', message: expect.stringMatching(/not a section; the sections are hero-split/) }),
       ])
       expect((error as Error).message).toContain('pages.yaml: page "home", section "hero-split" (sections[0]), field "heading": is required')
     })
@@ -303,18 +361,30 @@ describe('seedSite', () => {
     expect(lastIndex('create:pages')).toBeLessThan(firstIndex('update:pages'))
     expect(lastIndex('update:pages')).toBeLessThan(firstIndex('updateGlobal:header'))
 
-    expect(summary).toEqual({ categories: 3, media: 6, posts: 3, forms: 1, pages: 2, globals: ['header', 'footer'] })
+    expect(summary).toEqual({ categories: 3, media: 11, posts: 3, forms: 1, pages: 3, globals: ['header', 'footer'] })
 
     // Each media file is uploaded once, even when referenced twice (hero.jpg: hero and meta image).
     const uploads = calls.filter((call) => call.collection === 'media').map((call) => path.basename(call.args.filePath as string))
-    expect(uploads.sort()).toEqual(['avatar.jpg', 'hero.jpg', 'logo.svg', 'post-1.jpg', 'post-2.jpg', 'post-3.jpg'])
+    expect(uploads.sort()).toEqual([
+      'about.jpg',
+      'avatar.jpg',
+      'hero.jpg',
+      'logo.svg',
+      'post-1.jpg',
+      'post-2.jpg',
+      'post-3.jpg',
+      'team-hana.jpg',
+      'team-ines.jpg',
+      'team-leo.jpg',
+      'team-tomas.jpg',
+    ])
     expect(calls.find((call) => String(call.args.filePath).endsWith('hero.jpg'))!.args.data).toEqual({
       alt: 'Blue and sand gradient with the word Studio',
     })
 
     // Pass 1 creates drafts; pass 2 publishes the full layout with links resolved to ids.
     const created = calls.filter((call) => call.op === 'create' && call.collection === 'pages')
-    expect(created.map((call) => call.args.draft)).toEqual([true, true])
+    expect(created.map((call) => call.args.draft)).toEqual([true, true, true])
     const pageId = (slug: string) => created.find((call) => (call.args.data as { slug: string }).slug === slug)!.id
 
     const home = calls.find((call) => call.op === 'update' && call.args.id === pageId('home'))!.args.data as {
@@ -338,11 +408,29 @@ describe('seedSite', () => {
     expect(home.layout[4]!.form).toMatch(/^forms-/)
     expect(home.meta.image).toBe(home.layout[0]!.image)
 
-    // The Contact page's hero has no image and stores none.
+    // The About page: a cover hero sharing its image with the meta, team photos as ids, FAQ answers as rich text.
+    const about = calls.find((call) => call.op === 'update' && call.args.id === pageId('about'))!.args.data as {
+      layout: Record<string, unknown>[]
+      meta: Record<string, unknown>
+    }
+    expect(about.layout.map((row) => row.blockType)).toEqual(['hero-cover', 'stats', 'team', 'faq', 'testimonial'])
+    expect(about.layout[0]!.image).toMatch(/^media-/)
+    expect(about.meta.image).toBe(about.layout[0]!.image)
+    const members = about.layout[2]!.members as { photo: string; name: string }[]
+    expect(members.map((member) => member.name)).toEqual(['Ines Okafor', 'Tomas Reyes', 'Hana Sato', 'Leo Marchetti'])
+    expect(members.every((member) => /^media-/.test(member.photo))).toBe(true)
+    const faq = about.layout[3]!.items as { answer: unknown }[]
+    expect(faq).toHaveLength(5)
+    expect(faq[0]!.answer).toEqual({
+      lexical: expect.stringContaining('**eight to twelve weeks**'),
+      target: { block: 'faq', fieldPath: ['items', 'answer'] },
+    })
+
+    // The Contact page opens with the image-less hero.
     const contact = calls.find((call) => call.op === 'update' && call.args.id === pageId('contact'))!.args.data as {
       layout: Record<string, unknown>[]
     }
-    expect(contact.layout[0]).not.toHaveProperty('image')
+    expect(contact.layout.map((row) => row.blockType)).toEqual(['hero-simple', 'contact'])
 
     // A form's confirmation message is rich text, converted with the forms field's editor.
     const form = calls.find((call) => call.collection === 'forms')!.args.data as Record<string, unknown>
@@ -358,7 +446,7 @@ describe('seedSite', () => {
 
     const header = calls.find((call) => call.slug === 'header')!.args
     expect(header.context).toEqual({ disableRevalidate: true })
-    expect((header.data as { navItems: unknown[] }).navItems).toHaveLength(3)
+    expect((header.data as { navItems: unknown[] }).navItems).toHaveLength(4)
   })
 
   it('passes a form redirect through and converts each notification email message', async () => {
@@ -412,7 +500,7 @@ describe('seedSite', () => {
 describe('getHomeFallback', () => {
   it('returns the home layout as rows that need no documents', async () => {
     const rows = await getHomeFallback(TEMPLATES_DIR, manifest)
-    expect(rows.map((row) => row.blockType)).toEqual(manifest.blocks)
+    expect(rows.map((row) => row.blockType)).toEqual(['hero-split', 'features', 'latest-posts', 'testimonial', 'contact'])
     const [hero, , posts, testimonial, contact] = rows
     expect(hero).not.toHaveProperty('image')
     expect(hero!.primaryButton).toEqual({ type: 'custom', url: '/contact', label: 'Start a project', newTab: false })

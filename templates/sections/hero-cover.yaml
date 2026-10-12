@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=../schema.json
+name: hero-cover
+label: Cover hero
+plural: Cover heroes
+description: A full-bleed image with the heading and copy set over a dark fade at the bottom.
+group: Heroes
+
+fields:
+  eyebrow: text
+  heading:
+    type: text
+    required: true
+  description: textarea
+  button: link
+  image:
+    type: image
+    required: true
+    help: Fills the section. Keep the lower third quiet; the copy sits there.
+
+layout:
+  - div: relative isolate min-h-[70vh] overflow-hidden bg-foreground
+    as: section
+    children:
+      - image: image
+        class: absolute inset-0 -z-10 h-full w-full object-cover
+        priority: true
+        sizes: 100vw
+      - div: absolute inset-0 flex items-end bg-gradient-to-t from-black/70 via-black/30 to-transparent
+        children:
+          - div: container flex max-w-4xl flex-col gap-5 pb-16 md:pb-20
+            children:
+              - text: eyebrow
+                as: span
+                class: text-xs font-medium uppercase tracking-[0.2em] text-white/80
+                if: eyebrow
+              - text: heading
+                as: h1
+                variant: heading.display
+                class: text-white
+              - text: description
+                class: max-w-2xl text-lg leading-relaxed text-white/85
+                if: description
+              - div: flex flex-wrap gap-3 pt-2
+                if: button
+                children:
+                  - button: button
+                    variant: button.primary

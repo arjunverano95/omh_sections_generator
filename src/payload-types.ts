@@ -267,7 +267,18 @@ export interface User {
 export interface Page {
   id: string;
   title: string;
-  layout: (ContactBlock | FeaturesBlock | HeroSplitBlock | LatestPostsBlock | TestimonialBlock)[];
+  layout: (
+    | ContactBlock
+    | FaqBlock
+    | FeaturesBlock
+    | HeroCoverBlock
+    | HeroSimpleBlock
+    | HeroSplitBlock
+    | LatestPostsBlock
+    | StatsBlock
+    | TeamBlock
+    | TestimonialBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -468,6 +479,24 @@ export interface Textarea {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock".
+ */
+export interface FaqBlock {
+  heading?: string | null;
+  intro?: string | null;
+  items?:
+    | {
+        question: string;
+        answer: LexicalRichText<LexicalNodes_AD327369>;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "FeaturesBlock".
  */
 export interface FeaturesBlock {
@@ -569,28 +598,13 @@ export interface FeaturesBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "HeroSplitBlock".
+ * via the `definition` "HeroCoverBlock".
  */
-export interface HeroSplitBlock {
+export interface HeroCoverBlock {
   eyebrow?: string | null;
   heading: string;
   description?: string | null;
-  primaryButton?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: string | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: string | Post;
-        } | null);
-    url?: string | null;
-    label?: string | null;
-  };
-  secondaryButton?: {
+  button?: {
     type?: ('reference' | 'custom') | null;
     newTab?: boolean | null;
     reference?:
@@ -606,12 +620,12 @@ export interface HeroSplitBlock {
     label?: string | null;
   };
   /**
-   * Optional. Without an image the copy spans the full width.
+   * Fills the section. Keep the lower third quiet; the copy sits there.
    */
-  image?: (string | null) | Media;
+  image: string | Media;
   id?: string | null;
   blockName?: string | null;
-  blockType: 'hero-split';
+  blockType: 'hero-cover';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -794,6 +808,64 @@ export interface Category {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroSimpleBlock".
+ */
+export interface HeroSimpleBlock {
+  eyebrow?: string | null;
+  heading: string;
+  description?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero-simple';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroSplitBlock".
+ */
+export interface HeroSplitBlock {
+  eyebrow?: string | null;
+  heading: string;
+  description?: string | null;
+  primaryButton?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  secondaryButton?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Optional. Without an image the copy spans the full width.
+   */
+  image?: (string | null) | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'hero-split';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "LatestPostsBlock".
  */
 export interface LatestPostsBlock {
@@ -820,6 +892,49 @@ export interface LatestPostsBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'latest-posts';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBlock".
+ */
+export interface StatsBlock {
+  heading?: string | null;
+  intro?: string | null;
+  items?:
+    | {
+        /**
+         * The figure as it should read, such as 12, 140+ or 98%.
+         */
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'stats';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TeamBlock".
+ */
+export interface TeamBlock {
+  heading?: string | null;
+  intro?: string | null;
+  members?:
+    | {
+        /**
+         * Square works best.
+         */
+        photo?: (string | null) | Media;
+        name: string;
+        role?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'team';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1186,9 +1301,14 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         contact?: T | ContactBlockSelect<T>;
+        faq?: T | FaqBlockSelect<T>;
         features?: T | FeaturesBlockSelect<T>;
+        'hero-cover'?: T | HeroCoverBlockSelect<T>;
+        'hero-simple'?: T | HeroSimpleBlockSelect<T>;
         'hero-split'?: T | HeroSplitBlockSelect<T>;
         'latest-posts'?: T | LatestPostsBlockSelect<T>;
+        stats?: T | StatsBlockSelect<T>;
+        team?: T | TeamBlockSelect<T>;
         testimonial?: T | TestimonialBlockSelect<T>;
       };
   meta?:
@@ -1219,6 +1339,23 @@ export interface ContactBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock_select".
+ */
+export interface FaqBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  items?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "FeaturesBlock_select".
  */
 export interface FeaturesBlockSelect<T extends boolean = true> {
@@ -1233,6 +1370,38 @@ export interface FeaturesBlockSelect<T extends boolean = true> {
         text?: T;
         id?: T;
       };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroCoverBlock_select".
+ */
+export interface HeroCoverBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  description?: T;
+  button?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
+  image?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HeroSimpleBlock_select".
+ */
+export interface HeroSimpleBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  description?: T;
   id?: T;
   blockName?: T;
 }
@@ -1281,6 +1450,41 @@ export interface LatestPostsBlockSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
         label?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StatsBlock_select".
+ */
+export interface StatsBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  items?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TeamBlock_select".
+ */
+export interface TeamBlockSelect<T extends boolean = true> {
+  heading?: T;
+  intro?: T;
+  members?:
+    | T
+    | {
+        photo?: T;
+        name?: T;
+        role?: T;
+        id?: T;
       };
   id?: T;
   blockName?: T;

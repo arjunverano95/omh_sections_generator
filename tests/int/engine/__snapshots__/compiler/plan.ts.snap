@@ -58,6 +58,97 @@ export const plans: Plans = {
       className: 'container grid gap-12 py-20 md:grid-cols-2',
     },
   ],
+  faq: [
+    {
+      type: 'div',
+      as: 'section',
+      children: [
+        {
+          type: 'div',
+          as: 'div',
+          children: [
+            {
+              type: 'text',
+              source: {
+                path: [
+                  'heading',
+                ],
+                depth: 0,
+              },
+              as: 'h2',
+              className: 'font-heading text-3xl tracking-tight md:text-4xl',
+              if: {
+                path: [
+                  'heading',
+                ],
+                depth: 0,
+              },
+            },
+            {
+              type: 'text',
+              source: {
+                path: [
+                  'intro',
+                ],
+                depth: 0,
+              },
+              as: 'p',
+              className: 'text-lg leading-relaxed text-muted-foreground',
+              if: {
+                path: [
+                  'intro',
+                ],
+                depth: 0,
+              },
+            },
+          ],
+          className: 'flex flex-col gap-4',
+        },
+        {
+          type: 'each',
+          source: {
+            path: [
+              'items',
+            ],
+            depth: 0,
+          },
+          as: 'div',
+          children: [
+            {
+              type: 'div',
+              as: 'details',
+              children: [
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'question',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'summary',
+                  className: 'flex cursor-pointer list-none items-center justify-between gap-6 py-5 font-heading text-xl after:text-2xl after:font-light after:text-muted-foreground after:content-[\'+\'] group-open:after:content-[\'−\'] [&::-webkit-details-marker]:hidden',
+                },
+                {
+                  type: 'richText',
+                  source: {
+                    path: [
+                      'answer',
+                    ],
+                    depth: 0,
+                  },
+                  className: 'mx-0 max-w-2xl pb-6 text-muted-foreground',
+                },
+              ],
+              className: 'group border-b border-border',
+            },
+          ],
+          className: 'flex flex-col border-t border-border',
+        },
+      ],
+      className: 'container grid gap-12 py-20 md:grid-cols-[1fr_2fr]',
+    },
+  ],
   features: [
     {
       type: 'div',
@@ -280,6 +371,170 @@ export const plans: Plans = {
         },
       ],
       className: 'container flex flex-col gap-12 py-20',
+    },
+  ],
+  'hero-cover': [
+    {
+      type: 'div',
+      as: 'section',
+      children: [
+        {
+          type: 'image',
+          source: {
+            path: [
+              'image',
+            ],
+            depth: 0,
+          },
+          priority: true,
+          sizes: '100vw',
+          className: 'absolute inset-0 -z-10 h-full w-full object-cover',
+        },
+        {
+          type: 'div',
+          as: 'div',
+          children: [
+            {
+              type: 'div',
+              as: 'div',
+              children: [
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'eyebrow',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'span',
+                  className: 'text-xs font-medium uppercase tracking-[0.2em] text-white/80',
+                  if: {
+                    path: [
+                      'eyebrow',
+                    ],
+                    depth: 0,
+                  },
+                },
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'heading',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'h1',
+                  className: 'font-heading text-5xl leading-[1.05] tracking-tight md:text-6xl text-white',
+                },
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'description',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'p',
+                  className: 'max-w-2xl text-lg leading-relaxed text-white/85',
+                  if: {
+                    path: [
+                      'description',
+                    ],
+                    depth: 0,
+                  },
+                },
+                {
+                  type: 'div',
+                  as: 'div',
+                  children: [
+                    {
+                      type: 'button',
+                      source: {
+                        path: [
+                          'button',
+                        ],
+                        depth: 0,
+                      },
+                      className: 'inline-flex items-center justify-center rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90',
+                    },
+                  ],
+                  className: 'flex flex-wrap gap-3 pt-2',
+                  if: {
+                    path: [
+                      'button',
+                    ],
+                    depth: 0,
+                  },
+                },
+              ],
+              className: 'container flex max-w-4xl flex-col gap-5 pb-16 md:pb-20',
+            },
+          ],
+          className: 'absolute inset-0 flex items-end bg-gradient-to-t from-black/70 via-black/30 to-transparent',
+        },
+      ],
+      className: 'relative isolate min-h-[70vh] overflow-hidden bg-foreground',
+    },
+  ],
+  'hero-simple': [
+    {
+      type: 'div',
+      as: 'section',
+      children: [
+        {
+          type: 'div',
+          as: 'div',
+          children: [
+            {
+              type: 'text',
+              source: {
+                path: [
+                  'eyebrow',
+                ],
+                depth: 0,
+              },
+              as: 'span',
+              className: 'text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground',
+              if: {
+                path: [
+                  'eyebrow',
+                ],
+                depth: 0,
+              },
+            },
+            {
+              type: 'text',
+              source: {
+                path: [
+                  'heading',
+                ],
+                depth: 0,
+              },
+              as: 'h1',
+              className: 'font-heading text-5xl leading-[1.05] tracking-tight md:text-6xl',
+            },
+            {
+              type: 'text',
+              source: {
+                path: [
+                  'description',
+                ],
+                depth: 0,
+              },
+              as: 'p',
+              className: 'text-lg leading-relaxed text-muted-foreground',
+              if: {
+                path: [
+                  'description',
+                ],
+                depth: 0,
+              },
+            },
+          ],
+          className: 'flex max-w-3xl flex-col gap-5',
+        },
+      ],
+      className: 'container py-20 md:py-28',
     },
   ],
   'hero-split': [
@@ -522,6 +777,227 @@ export const plans: Plans = {
         },
       ],
       className: 'container flex flex-col gap-10 py-20',
+    },
+  ],
+  stats: [
+    {
+      type: 'div',
+      as: 'section',
+      children: [
+        {
+          type: 'div',
+          as: 'div',
+          children: [
+            {
+              type: 'div',
+              as: 'div',
+              children: [
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'heading',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'h2',
+                  className: 'font-heading text-3xl tracking-tight md:text-4xl',
+                },
+                {
+                  type: 'text',
+                  source: {
+                    path: [
+                      'intro',
+                    ],
+                    depth: 0,
+                  },
+                  as: 'p',
+                  className: 'text-lg leading-relaxed text-muted-foreground',
+                  if: {
+                    path: [
+                      'intro',
+                    ],
+                    depth: 0,
+                  },
+                },
+              ],
+              className: 'flex max-w-2xl flex-col gap-4',
+              if: {
+                path: [
+                  'heading',
+                ],
+                depth: 0,
+              },
+            },
+            {
+              type: 'each',
+              source: {
+                path: [
+                  'items',
+                ],
+                depth: 0,
+              },
+              as: 'ul',
+              children: [
+                {
+                  type: 'div',
+                  as: 'li',
+                  children: [
+                    {
+                      type: 'text',
+                      source: {
+                        path: [
+                          'value',
+                        ],
+                        depth: 0,
+                      },
+                      as: 'strong',
+                      className: 'font-heading text-5xl font-normal tracking-tight text-primary md:text-6xl',
+                    },
+                    {
+                      type: 'text',
+                      source: {
+                        path: [
+                          'label',
+                        ],
+                        depth: 0,
+                      },
+                      as: 'span',
+                      className: 'text-sm text-muted-foreground',
+                    },
+                  ],
+                  className: 'flex flex-col gap-2 border-l border-border pl-5',
+                },
+              ],
+              className: 'grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-4',
+            },
+          ],
+          className: 'container flex flex-col gap-12 py-20',
+        },
+      ],
+      className: 'border-y border-border',
+    },
+  ],
+  team: [
+    {
+      type: 'div',
+      as: 'section',
+      children: [
+        {
+          type: 'div',
+          as: 'div',
+          children: [
+            {
+              type: 'text',
+              source: {
+                path: [
+                  'heading',
+                ],
+                depth: 0,
+              },
+              as: 'h2',
+              className: 'font-heading text-3xl tracking-tight md:text-4xl',
+            },
+            {
+              type: 'text',
+              source: {
+                path: [
+                  'intro',
+                ],
+                depth: 0,
+              },
+              as: 'p',
+              className: 'text-lg leading-relaxed text-muted-foreground',
+              if: {
+                path: [
+                  'intro',
+                ],
+                depth: 0,
+              },
+            },
+          ],
+          className: 'flex max-w-2xl flex-col gap-4',
+          if: {
+            path: [
+              'heading',
+            ],
+            depth: 0,
+          },
+        },
+        {
+          type: 'each',
+          source: {
+            path: [
+              'members',
+            ],
+            depth: 0,
+          },
+          as: 'ul',
+          children: [
+            {
+              type: 'div',
+              as: 'li',
+              children: [
+                {
+                  type: 'image',
+                  source: {
+                    path: [
+                      'photo',
+                    ],
+                    depth: 0,
+                  },
+                  sizes: '(min-width: 768px) 25vw, 50vw',
+                  className: 'aspect-square w-full rounded-lg bg-muted object-cover',
+                  if: {
+                    path: [
+                      'photo',
+                    ],
+                    depth: 0,
+                  },
+                },
+                {
+                  type: 'div',
+                  as: 'div',
+                  children: [
+                    {
+                      type: 'text',
+                      source: {
+                        path: [
+                          'name',
+                        ],
+                        depth: 0,
+                      },
+                      as: 'h3',
+                      className: 'font-heading text-xl',
+                    },
+                    {
+                      type: 'text',
+                      source: {
+                        path: [
+                          'role',
+                        ],
+                        depth: 0,
+                      },
+                      as: 'p',
+                      className: 'text-sm text-muted-foreground',
+                      if: {
+                        path: [
+                          'role',
+                        ],
+                        depth: 0,
+                      },
+                    },
+                  ],
+                  className: 'flex flex-col gap-1',
+                },
+              ],
+              className: 'flex flex-col gap-4',
+            },
+          ],
+          className: 'grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4',
+        },
+      ],
+      className: 'container flex flex-col gap-12 py-20',
     },
   ],
   testimonial: [

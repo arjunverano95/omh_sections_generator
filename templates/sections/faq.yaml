@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=../schema.json
+name: faq
+label: FAQ
+plural: FAQs
+description: A heading and intro beside a list of questions that open to show their answers.
+group: Content
+
+fields:
+  heading: text
+  intro: textarea
+  items:
+    type: array
+    min: 1
+    max: 12
+    rowLabel: question
+    fields:
+      question:
+        type: text
+        required: true
+      answer:
+        type: richText
+        required: true
+
+layout:
+  - div: container grid gap-12 py-20 md:grid-cols-[1fr_2fr]
+    as: section
+    children:
+      - div: flex flex-col gap-4
+        children:
+          - text: heading
+            as: h2
+            variant: heading.section
+            if: heading
+          - text: intro
+            variant: text.lead
+            if: intro
+      - each: items
+        class: flex flex-col border-t border-border
+        as: div
+        children:
+          - div: group border-b border-border
+            as: details
+            children:
+              - text: question
+                as: summary
+                class: flex cursor-pointer list-none items-center justify-between gap-6 py-5 font-heading text-xl after:text-2xl after:font-light after:text-muted-foreground after:content-['+'] group-open:after:content-['−'] [&::-webkit-details-marker]:hidden
+              - richText: answer
+                class: mx-0 max-w-2xl pb-6 text-muted-foreground
